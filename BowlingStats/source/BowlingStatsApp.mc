@@ -2,27 +2,20 @@ import Toybox.Application;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-class BowlingStatsApp extends Application.AppBase {
-
-    function initialize() {
-        AppBase.initialize();
+class BowlingStatsApp extends WatchUi.Application{
+    function onStart() {
+        WatchUi.Application.onStart();
     }
 
-    // onStart() is called on application start up
-    function onStart(state as Dictionary?) as Void {
+    function onUpdate(dc as Graphics.Dc) {
+        var width = dc.getWidth();
+        var height = dc.getHeight();
+
+        // Clear the screen
+        dc.clear();
+
+        // Draw the text "Hello, World!" centered on the screen
+        var text = "Hello, World!";
+        dc.drawText(width / 2, height / 2, Graphics.FONT_XLARGE, text, Graphics.TEXT_JUSTIFY_CENTER);
     }
-
-    // onStop() is called when your application is exiting
-    function onStop(state as Dictionary?) as Void {
-    }
-
-    // Return the initial view of your application here
-    function getInitialView() as [Views] or [Views, InputDelegates] {
-        return [ new BowlingStatsView(), new BowlingStatsDelegate() ];
-    }
-
-}
-
-function getApp() as BowlingStatsApp {
-    return Application.getApp() as BowlingStatsApp;
 }
