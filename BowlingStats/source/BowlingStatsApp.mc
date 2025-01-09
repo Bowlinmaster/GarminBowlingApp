@@ -112,16 +112,21 @@ class GameActivityView extends WatchUi.View {
     }
 
     function saveGame() {
+        //Create the metrics associative array
         var metrics = { 
             "Score" => calculateScore(), 
             "OpenFrames" => countOpenFrames(), 
             "FrameDetails" => frameScores
         };
-        //var metrics = { "Score": calculateScore(), "OpenFrames": countOpenFrames(), "FrameDetails": frameScores };
-        for(var key in metrics){
+
+        //Loop through the array and set the metric on the currently running activity
+        var keys = metrics.getKeys();
+        for(var i = 0; i < keys.size(); i++){
+            var key = keys[i];
             activity.setMetric(key, metrics[key]);
         }
-        //activity.saveMetrics(metrics);
+
+        //Now stop the activity
         activity.stop();
     }
 
