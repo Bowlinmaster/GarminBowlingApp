@@ -1,17 +1,27 @@
+import Toybox.Application;
+import Toybox.Lang;
+import Toybox.WatchUi;
+
 using Toybox.WatchUi;
 using Toybox.System;
 using Toybox.Activity;
 
-class BowlingStats extends WatchUi.Application {
+class BowlingStatsApp extends Application.AppBase {
     function initialize() {
-        WatchUi.Application.initialize();
+        //WatchUi.Application.initialize();
+        //WatchUi.pushView(new MainActivityView());
+        AppBase.initialize(); //Call the parent class initializer
+    }
+
+    function onStart(state){
         WatchUi.pushView(new MainActivityView());
     }
 }
 
 class MainActivityView extends WatchUi.View {
     function onCreate() {
-        View.loadViewFromResource("MainView.xml");
+        //View.
+        //View.loadViewFromResource("MainView.xml");
     }
 
     function onShow() {
@@ -144,6 +154,8 @@ class GameActivityView extends WatchUi.View {
             maxPins = ball == 1 ? 10 : (10 - frameScores[currentFrame - 1][0]);
         }
 
+        var picker = View.findDrawableById("pinPicker") as WatchUi.TextPicker;
+
         var displayValues = [];
 
         for (var i = 0; i <= maxPins; i++) {
@@ -156,10 +168,11 @@ class GameActivityView extends WatchUi.View {
             }
         }
 
-        var picker = new WatchUi.TextPicker({
+        /*var picker = new WatchUi.TextPicker({
             values: displayValues,
             selectedIndex: displayValues.size() - 1 // Start at the highest index
-        });
+        });*/
+        picker.setValues(displayValues);
 
         picker.show(method(:onTextSelected));
     }
