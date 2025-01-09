@@ -19,10 +19,25 @@ class BowlingStatsApp extends Application.AppBase {
 }
 
 class MainActivityView extends WatchUi.View {
-    function onCreate() {
+    function initialize() {
+        WatchUi.View.initialize();
+    }
+
+    function onLayout(dc) {
+        //For fun for now, define the layout programatically:
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_WHITE);
+        dc.drawText(dc.getWidth() / 2, 40, Graphics.FONT_LARGE, "Bowling Game", Graphics.TEXT_JUSTIFY_CENTER);
+        //Add buttons
+        var startButton = new WatchUi.Drawable();
+        startButton.setBounds(50,100,200,40);
+        startButton.setText("Start Game");
+        startButton.onTap(method(:onStartGame));
+        //addChild(startButton)
+    }
+    /*function onCreate() {
         //View.
         //View.loadViewFromResource("MainView.xml");
-    }
+    }*/
 
     function onShow() {
         View.findDrawableById("startButton").onTap = method(:onStartGame);
@@ -44,12 +59,22 @@ class GameActivityView extends WatchUi.View {
     var frameScores = []; // Each frame is [ball1, ball2, optionalBall3]
     var activity; // Activity instance for metrics
 
-    function onCreate() {
+    function initialize(){
+        View.initialize();
+        
+    }
+
+    function onLayout(dc){
+        setLayout(Rez.Layouts.MainLayout(dc));
+        activity = new Activity.ActivityRecording();
+    }
+
+    /*function onCreate() {
         View.loadViewFromResource("GameView.xml");
         activity = new Activity.ActivityRecording(); //Use ActivityRecording
         //activity = new Activity.Activity(); //Initialize the activity
         //activity = new Activity.Activity({ type: "BowlingGame", name: "Bowling Game"});
-    }
+    }*/
 
     function onShow() {
         //Create the handlers for pin input and ending the game.
