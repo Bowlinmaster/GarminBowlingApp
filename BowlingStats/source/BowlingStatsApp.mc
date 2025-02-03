@@ -4,6 +4,9 @@ import Toybox.WatchUi;
 
 class BowlingStatsApp extends Application.AppBase {
 
+    //I need to be able to access the player from throughout the app, so set player as a member of the Application.
+    var player as Player?;
+
     function initialize() {
         System.println("App - initialize()");
         AppBase.initialize();
@@ -13,8 +16,8 @@ class BowlingStatsApp extends Application.AppBase {
     function onStart(state as Dictionary?) as Void {
         System.println("App - onStart()");
 
-        var p1 = new Player("Player1");
-        var game = p1.startNewGame();
+        player = new Player("Player1");
+        var game = player.startNewGame();
         game.roll(10); //Frame 1
         game.roll(10); //Frame 2
         game.roll(10); //Frame 3
@@ -27,7 +30,7 @@ class BowlingStatsApp extends Application.AppBase {
         game.roll(10); //Frame 9
         game.roll(6); //Frame 10
         game.roll(3);
-        game.roll(10);
+        game.roll(10); //Extra shot
         System.println("Game complete? " + game.isComplete() + ", Game Score: " + game.getScore());
     }
 
@@ -40,24 +43,31 @@ class BowlingStatsApp extends Application.AppBase {
     function getInitialView() as [Views] or [Views, InputDelegates] {
         System.println("App - getInitialView()");
 
-        //TODO: The desire for the bowling app is to have an initial Menu2 on startup.
-        //The Menu2 could have the possibility of 2 options.
+        var newMenu = true;
+
+        if (newMenu) {
+            //The Menu2 could have the possibility of 2 options.
             //Option 1: Start new game
             //Option 2: View stored games. If you Bowl multiple games, you can see your games here.
-        //This should return an array with either the View and the Delegate or just the View
-        var menu = new WatchUi.Menu2({:title=> "Bowling"});
-        //var menu = new WatchUi.Menu2();
-        menu.addItem(new WatchUi.MenuItem("New Game", null, "newgame", null));
-        //If player has games... add another menu item.
-        menu.addItem(new WatchUi.MenuItem("View Games", null, "viewgames", null));
-        return [menu, new $.BowlingMainMenuDelegate()];
-        //return [ new BowlingStatsView(), new BowlingStatsDelegate() ];
+            //This should return an array with either the View and the Delegate or just the View
+            var menu = new WatchUi.Menu2({:title=> "Bowling"});
+            menu.addItem(new WatchUi.MenuItem("New Game", null, "newgame", null));
+            //If player has games... add another menu item.
+            menu.addItem(new WatchUi.MenuItem("View Games", null, "viewgames", null));
+            return [menu, new $.BowlingMainMenu2Delegate()];
+        } else {
+            var menu = new WatchUi.Menu();
+            menu.setTitle("Bowling");
+            menu.addItem("New Game", :one);
+            menu.addItem("View Games", :two);
+            return [menu, new $.BowlingMainMenuDelegate()];
+        }
     }
 
 }
 
+//TODO: Do I need this or could I just always use Application.getApp()
 function getApp() as BowlingStatsApp {
-    //System.println("App - getApp()");
     return Application.getApp() as BowlingStatsApp;
 }
 
@@ -138,7 +148,7 @@ class Frame {
 }
 
 class BowlingGame {
-    var frames;
+    var frames as Lang.Array<Frame>;
     const MAX_FRAMES = 10;
 
     function initialize(){
@@ -179,7 +189,11 @@ class BowlingGame {
         var lastFrame = self.frames[self.frames.size() - 1];
 
         if(lastFrame.removeLastRoll()){
-            frames.remove(frames.size() - 1);
+            //frames.remove(frames.size() - 1); //The dream method...
+            //Can't call .remove() with an index.  Instead, call .slice() and remove the last element.
+            System.println(frames);
+            frames = frames.slice(0,-1);
+            System.println(frames); 
         }
     }
 
@@ -208,7 +222,7 @@ class BowlingGame {
 
 class Player {
     var name;
-    var games;
+    var games as Lang.Array<BowlingGame>;
 
     function initialize(name){
         self.name = name;
