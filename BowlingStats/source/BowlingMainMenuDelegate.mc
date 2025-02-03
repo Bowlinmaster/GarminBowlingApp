@@ -16,6 +16,10 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
         if(id.equals("newgame")) {
             System.println("Selected New Game");
             //Now go into the Picker view that will work through processing the game
+            
+            //Create the picker and also pass it into the delegate.  TODO: Might not need to pass to delegate.  Evaluate dependency in delegate
+            var picker = new $.BowlingFrameEntryPicker();
+            WatchUi.pushView(picker, new $.BowlingFrameEntryPickerDelegate(picker), WatchUi.SLIDE_IMMEDIATE);
         } else if (id.equals("viewgames")) {
             System.println("Selected View Games");
             //Now go into the view that allows you to scroll through completed games.
@@ -40,6 +44,9 @@ class BowlingMainMenuDelegate extends WatchUi.MenuInputDelegate{
         if (item == :one) {
             System.println("Selected new game from og menu");
             //Now go into the Picker view that will work through precessing the bowling game.
+            //Create the picker and also pass it into the delegate.  TODO: Might not need to pass to delegate.  Evaluate dependency in delegate
+            var picker = new $.BowlingFrameEntryPicker();
+            WatchUi.pushView(picker, new $.BowlingFrameEntryPickerDelegate(picker), WatchUi.SLIDE_IMMEDIATE);
         }
         else if (item == :two) {
             System.println("Selected view games from og menu");
