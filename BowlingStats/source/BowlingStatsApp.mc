@@ -25,8 +25,8 @@ class BowlingStatsApp extends Application.AppBase {
         game.roll(10); //Frame 7
         game.roll(10); //Frame 8
         game.roll(10); //Frame 9
-        game.roll(10); //Frame 10
-        game.roll(10);
+        game.roll(6); //Frame 10
+        game.roll(3);
         game.roll(10);
         System.println("Game complete? " + game.isComplete() + ", Game Score: " + game.getScore());
     }
@@ -40,8 +40,18 @@ class BowlingStatsApp extends Application.AppBase {
     function getInitialView() as [Views] or [Views, InputDelegates] {
         System.println("App - getInitialView()");
 
+        //TODO: The desire for the bowling app is to have an initial Menu2 on startup.
+        //The Menu2 could have the possibility of 2 options.
+            //Option 1: Start new game
+            //Option 2: View stored games. If you Bowl multiple games, you can see your games here.
         //This should return an array with either the View and the Delegate or just the View
-        return [ new BowlingStatsView(), new BowlingStatsDelegate() ];
+        var menu = new WatchUi.Menu2({:title=> "Bowling"});
+        //var menu = new WatchUi.Menu2();
+        menu.addItem(new WatchUi.MenuItem("New Game", null, "newgame", null));
+        //If player has games... add another menu item.
+        menu.addItem(new WatchUi.MenuItem("View Games", null, "viewgames", null));
+        return [menu, new $.BowlingMainMenuDelegate()];
+        //return [ new BowlingStatsView(), new BowlingStatsDelegate() ];
     }
 
 }

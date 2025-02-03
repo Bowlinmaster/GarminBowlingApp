@@ -14,4 +14,9 @@ class BowlingStatsDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
+    function onSelect() {
+        System.println("Delegate and I just aded the ability to click select");
+        return true;
+    }
+
 }
