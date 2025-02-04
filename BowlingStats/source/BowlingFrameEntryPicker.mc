@@ -18,6 +18,15 @@ class BowlingFrameEntryPicker extends WatchUi.Picker {
         _factory.setCharacterSet("0123456789X");
         var titleText = "Frame: 1 Ball: 1";
         var pickerOptions = {:pattern=>[_factory]};
+        //All possible picker options:
+        /*
+        :title - Drawable
+        :pattern - Array or Drawable or Factory
+        :defaults - Array
+        :nextArrow - Drawable
+        :previousArrow - Drawable
+        :confirm - Drawable
+        */
 
         //TODO: work on updating the title
         //TODO: Title is freaking huge.  How to have smaller title with picker?
@@ -26,6 +35,7 @@ class BowlingFrameEntryPicker extends WatchUi.Picker {
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER, 
             :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, 
             :color=>Graphics.COLOR_WHITE,
+            :font=>Graphics.FONT_XTINY
         });
 
         pickerOptions[:title] = _title;
@@ -79,21 +89,24 @@ class BowlingRollFactory extends WatchUi.PickerFactory {
         return _characterSet.find(value);
     }
 
+    //Required method to override
     public function getSize() as Number {
         return _characterSet.length();
     }
 
+    //Required method to override
     //For getValue, do I really want to return the string or do I really want to return the index which is the value of the choice
     public function getValue(index as Number) as Object? {
         System.println("Inside getValue" + index);
         return _characterSet.substring(index, index+1);
     }
 
+    //Required method to override
     public function getDrawable(item, isSelected) as Drawable? {
         return new WatchUi.Text({
             :text=>getValue(item) as String,
             :color=>Graphics.COLOR_WHITE,
-            :font=>Graphics.FONT_SMALL,
+            :font=>Graphics.FONT_MEDIUM,
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
             :locY=>WatchUi.LAYOUT_VALIGN_CENTER
         });
