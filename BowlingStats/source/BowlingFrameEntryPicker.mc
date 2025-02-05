@@ -4,7 +4,7 @@ import Toybox.Graphics;
 
 //Class that is used to collect rolls for a frame
 class BowlingFrameEntryPicker extends WatchUi.Picker {
-    private var _factory as BowlingRollFactory;
+    public var _factory as BowlingRollFactory;
     private var _title as Text;
 
     //Initialize the picker.
@@ -49,6 +49,8 @@ class BowlingFrameEntryPicker extends WatchUi.Picker {
         dc.clear();
         Picker.onUpdate(dc);
     }
+
+    //TODO:  Need to update the factory based on... the current frame and roll
 }
 
 class BowlingFrameEntryPickerDelegate extends WatchUi.PickerDelegate {
@@ -63,12 +65,16 @@ class BowlingFrameEntryPickerDelegate extends WatchUi.PickerDelegate {
         System.println("trying to cancel");
         //TODO: If frame is 1 and roll is 1, pop the view
         //      else, do an unroll
+        //          Probably need to delete the game from the list ad set the current game to null...
+        $.getApp().player.getCurrentGame().unroll();
         return true;
     }
 
     public function onAccept(values as Array) as Boolean {
         var chosenValue = values[0] as String;
-        System.println("I just selected: " + chosenValue);
+        var myRoll = _picker._factory.getIndex(chosenValue);
+        System.println("About to roll: " + myRoll);
+        $.getApp().player.getCurrentGame().roll(myRoll);
         return true;
     }
 }
@@ -85,7 +91,6 @@ class BowlingRollFactory extends WatchUi.PickerFactory {
     }
 
     public function getIndex(value as String) as Number? {
-        System.println("Inside getIndex " + value);
         return _characterSet.find(value);
     }
 
@@ -97,7 +102,6 @@ class BowlingRollFactory extends WatchUi.PickerFactory {
     //Required method to override
     //For getValue, do I really want to return the string or do I really want to return the index which is the value of the choice
     public function getValue(index as Number) as Object? {
-        System.println("Inside getValue" + index);
         return _characterSet.substring(index, index+1);
     }
 
@@ -106,7 +110,7 @@ class BowlingRollFactory extends WatchUi.PickerFactory {
         return new WatchUi.Text({
             :text=>getValue(item) as String,
             :color=>Graphics.COLOR_WHITE,
-            :font=>Graphics.FONT_MEDIUM,
+            :font=>Graphics.FONT_GLANCE,
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
             :locY=>WatchUi.LAYOUT_VALIGN_CENTER
         });

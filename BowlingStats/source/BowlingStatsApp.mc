@@ -17,6 +17,7 @@ class BowlingStatsApp extends Application.AppBase {
         System.println("App - onStart()");
 
         player = new Player("Player1");
+        /*
         var game = player.startNewGame();
         game.roll(10); //Frame 1
         game.roll(10); //Frame 2
@@ -32,6 +33,7 @@ class BowlingStatsApp extends Application.AppBase {
         game.roll(3);
         game.roll(10); //Extra shot
         System.println("Game complete? " + game.isComplete() + ", Game Score: " + game.getScore());
+        */
     }
 
     // onStop() is called when your application is exiting
@@ -223,15 +225,21 @@ class BowlingGame {
 class Player {
     var name;
     var games as Lang.Array<BowlingGame>;
+    private var _currentGame as BowlingGame?;
 
     function initialize(name){
         self.name = name;
         self.games = [];
+        self._currentGame = null;
     }
 
     function startNewGame(){
-        var game = new BowlingGame();
-        games.add(game);
-        return game;
+        self._currentGame = new BowlingGame();
+        self.games.add(self._currentGame);
+        return self._currentGame;
+    }
+
+    public function getCurrentGame() as BowlingGame {
+        return self._currentGame;
     }
 }
