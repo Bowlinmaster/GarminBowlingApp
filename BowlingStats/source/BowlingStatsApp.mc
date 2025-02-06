@@ -220,6 +220,25 @@ class BowlingGame {
     function isComplete() {
         return self.frames.size() == MAX_FRAMES && self.frames[MAX_FRAMES - 1].isComplete();
     }
+
+    function getCurrentRollNumber(){
+        if (frames.size() == 0){
+            return 1;
+        }
+
+        var lastFrame = frames[frames.size() - 1];
+
+        if (frames.size() < MAX_FRAMES){
+            return lastFrame.isComplete() ? 1 : 2;
+        }
+        else {
+            //TODO: This is incorrectly determining the third roll. Maybe
+            return lastFrame.secondRoll == null ? 2 : (lastFrame.isStrike() || lastFrame.isSpare()) && lastFrame.thirdRoll == null ? 3 : 1;
+        }  
+    }
+    function getCurrentFrameNumber(){
+        return frames.size() + ((frames.size() < MAX_FRAMES && frames[frames.size() - 1].isComplete()) ? 1 : 0);
+    }
 }
 
 class Player {
