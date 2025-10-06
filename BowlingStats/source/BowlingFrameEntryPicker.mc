@@ -106,7 +106,7 @@ class BowlingFrameEntryPickerDelegate extends WatchUi.PickerDelegate {
         //TODO: If frame is 1 and roll is 1, pop the view
         //      else, do an unroll
         //          Probably need to delete the game from the list ad set the current game to null...
-        $.getApp().player.getCurrentGame().unroll();
+        //$.getApp().player.getCurrentGame().unroll();
         return true;
     }
 
@@ -116,12 +116,12 @@ class BowlingFrameEntryPickerDelegate extends WatchUi.PickerDelegate {
         //var myRoll = 10-myRollIndex;
         var myRoll = myRollIndex;
         System.println("About to roll: " + myRoll);
-        $.getApp().player.getCurrentGame().roll(myRoll);
+        //$.getApp().player.getCurrentGame().roll(myRoll);
 
         //Now that we have rolled the ball, go ahead and update visual information for the next roll.
         
         //Update the title 
-        var nextRollNum = $.getApp().player.getCurrentGame().getCurrentRollNumber();
+        /*var nextRollNum = $.getApp().player.getCurrentGame().getCurrentRollNumber();
         var nextFrameNum = $.getApp().player.getCurrentGame().getCurrentFrameNumber();
         var nextScore = $.getApp().player.getCurrentGame().getScore();
         System.println("The next frame and roll is now going to be: " + nextFrameNum + " " + nextRollNum);
@@ -134,7 +134,7 @@ class BowlingFrameEntryPickerDelegate extends WatchUi.PickerDelegate {
         } else {
             //TODO: Need to handle 10th frame case.
             _picker.setPickerFactoryCharacterSetFromScore(10-myRoll);
-        }
+        }*/
 
         //TODO: Should we instead push a new picker instead of trying to update the above?
         //      The reason why updating above might not be good is because once I update the options, I'm given an empty choice.

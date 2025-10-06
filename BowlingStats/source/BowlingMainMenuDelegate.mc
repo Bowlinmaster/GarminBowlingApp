@@ -3,8 +3,11 @@ import Toybox.Lang;
 
 //Menu2 implementation
 class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
+    
+    //initialize the delegate
     public function initialize() {
         WatchUi.Menu2InputDelegate.initialize();
+        
     }
 
     //When an item is selected from the main menu, go to the next view based on the selection.
@@ -16,16 +19,30 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
         if(id.equals("newgame")) {
             System.println("Selected New Game");
             //Go ahead and actually start the new game.
-            $.getApp().player.startNewGame();
+            //$.getApp().player.startNewGame();
 
             //Now go into the Picker view that will work through processing the game
             //Create the picker and also pass it into the delegate.  TODO: Might not need to pass to delegate.  Evaluate dependency in delegate
-            var picker = new $.BowlingFrameEntryPicker();
-            WatchUi.pushView(picker, new $.BowlingFrameEntryPickerDelegate(picker), WatchUi.SLIDE_IMMEDIATE);
-        } else if (id.equals("viewgames")) {
-            System.println("Selected View Games");
+            //var picker = new $.BowlingFrameEntryPicker();
+            //WatchUi.pushView(picker, new $.BowlingFrameEntryPickerDelegate(picker), WatchUi.SLIDE_IMMEDIATE);
+
+            //TODO: Now I want to actually get into the game based on the current pinEntryMode
+
+        } else if (id.equals("togglemode")) {
+            var app = $.getApp();
+            System.println("Selected Togglemode");
+            //Toggle the entry mode.
+            app.usePinEntryMode = !app.usePinEntryMode;
+            System.println("Mode is now: " + app.usePinEntryMode);
+            var newMenu = app.buildMainMenu();
+            WatchUi.switchToView(newMenu, new $.BowlingMainMenu2Delegate(), WatchUi.SLIDE_IMMEDIATE);
+            //How do I refresh the visual of the menu?
+            //System.println("Selected View Games");
             //Now go into the view that allows you to scroll through completed games.
             //TODO: Look at already completed games
+            return;
+        } else if (id.equals("viewgames")) {
+            System.println("Selected view games");
         }
     }
 
@@ -33,6 +50,8 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
         System.exit();
     }
 }
+
+/*
 //Menu implementation
 class BowlingMainMenuDelegate extends WatchUi.MenuInputDelegate{
 
@@ -62,3 +81,4 @@ class BowlingMainMenuDelegate extends WatchUi.MenuInputDelegate{
         System.exit();
     }
 }
+*/

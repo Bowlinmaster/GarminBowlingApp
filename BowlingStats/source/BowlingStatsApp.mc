@@ -5,8 +5,11 @@ import Toybox.WatchUi;
 class BowlingStatsApp extends Application.AppBase {
 
     //I need to be able to access the player from throughout the app, so set player as a member of the Application.
-    var player as Player?;
+    //var player as Player?;
+    //Toggle between simple and pin mode.
+    var usePinEntryMode = false;
 
+    //Initialize the application
     function initialize() {
         System.println("App - initialize()");
         AppBase.initialize();
@@ -16,7 +19,7 @@ class BowlingStatsApp extends Application.AppBase {
     function onStart(state as Dictionary?) as Void {
         System.println("App - onStart()");
 
-        player = new Player("Player1");
+        //player = new Player("Player1");
         /*
         var game = player.startNewGame();
         game.roll(10); //Frame 1
@@ -45,25 +48,31 @@ class BowlingStatsApp extends Application.AppBase {
     function getInitialView() as [Views] or [Views, InputDelegates] {
         System.println("App - getInitialView()");
 
-        var newMenu = true;
+        //Let's build the main menu.
+        //For us, we have 3 options.  
+        //  Start new game
+        //  Toggle Entry mode
+        //  View Games (todo)
+        var menu = buildMainMenu();
+        return [menu, new $.BowlingMainMenu2Delegate()];
 
-        if (newMenu) {
-            //The Menu2 could have the possibility of 2 options.
-            //Option 1: Start new game
-            //Option 2: View stored games. If you Bowl multiple games, you can see your games here.
-            //This should return an array with either the View and the Delegate or just the View
-            var menu = new WatchUi.Menu2({:title=> "Bowling"});
-            menu.addItem(new WatchUi.MenuItem("New Game", null, "newgame", null));
-            //If player has games... add another menu item.
-            menu.addItem(new WatchUi.MenuItem("View Games", null, "viewgames", null));
-            return [menu, new $.BowlingMainMenu2Delegate()];
-        } else {
+        /*
             var menu = new WatchUi.Menu();
             menu.setTitle("Bowling");
             menu.addItem("New Game", :one);
             menu.addItem("View Games", :two);
             return [menu, new $.BowlingMainMenuDelegate()];
-        }
+        }*/
+    }
+
+    function buildMainMenu() as WatchUi.Menu2 {
+        var menu = new WatchUi.Menu2({ :title => "Bowling" });
+        var modeText = self.usePinEntryMode ? "Pin" : "Simple";
+        menu.addItem(new WatchUi.MenuItem("Entry Mode: " + (modeText), null, "togglemode", null));
+        menu.addItem(new WatchUi.MenuItem("Start New Game", null, "newgame", null));
+        menu.addItem(new WatchUi.MenuItem("View Games", null, "viewgames", null));
+
+        return menu;
     }
 
 }
@@ -73,6 +82,7 @@ function getApp() as BowlingStatsApp {
     return Application.getApp() as BowlingStatsApp;
 }
 
+/*
 class Frame {
     var firstRoll;
     var secondRoll;
@@ -262,3 +272,4 @@ class Player {
         return self._currentGame;
     }
 }
+*/
