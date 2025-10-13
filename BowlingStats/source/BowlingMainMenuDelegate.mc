@@ -17,6 +17,7 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
         var id = item.getId() as String;
 
         if(id.equals("newgame")) {
+            var app = $.getApp();
             System.println("Selected New Game");
             //Go ahead and actually start the new game.
             //$.getApp().player.startNewGame();
@@ -27,6 +28,19 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
             //WatchUi.pushView(picker, new $.BowlingFrameEntryPickerDelegate(picker), WatchUi.SLIDE_IMMEDIATE);
 
             //TODO: Now I want to actually get into the game based on the current pinEntryMode
+            var game = new Game();
+            var view;
+            var theDelegate;
+            if(app.usePinEntryMode){
+                //view = new PinEntryView();
+                view = new SimpleEntryView(game, method(:onGameComplete)); //TMP to compile
+                theDelegate = new SimpleEntryDelegate(game, method(:onGameComplete));
+            } else {
+                view = new SimpleEntryView(game, method(:onGameComplete));
+                theDelegate = new SimpleEntryDelegate(game, method(:onGameComplete));
+            }
+
+            WatchUi.pushView(view, theDelegate, WatchUi.SLIDE_IMMEDIATE);
 
         } else if (id.equals("togglemode")) {
             var app = $.getApp();
@@ -48,6 +62,12 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
 
     public function onBack() as Void {
         System.exit();
+    }
+
+    public function onGameComplete() as Void {
+        System.println("In onGameComplete callback");
+        //When the game is complete, pop back to the main menu.
+        //WatchUi.popToRootView(WatchUi.SLIDE_IMMEDIATE);
     }
 }
 
