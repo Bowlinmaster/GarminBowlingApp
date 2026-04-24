@@ -10,8 +10,7 @@ class SimpleEntryView extends WatchUi.View {
         WatchUi.View.initialize();
         _game = game;
         _onComplete = onComplete;
-        _selectedPins = 0;
-        clampSelection();
+        resetSelectionToMax();
     }
 
     function adjustSelection(delta) {
@@ -29,7 +28,7 @@ class SimpleEntryView extends WatchUi.View {
         }
 
         if (_game.recordThrow(_selectedPins)) {
-            clampSelection();
+            resetSelectionToMax();
             WatchUi.requestUpdate();
         }
     }
@@ -42,6 +41,10 @@ class SimpleEntryView extends WatchUi.View {
         }
 
         return false;
+    }
+
+    function resetSelectionToMax() {
+        _selectedPins = _game.getPinsRemaining();
     }
 
     function onUpdate(dc) {
@@ -171,7 +174,7 @@ class SimpleEntryDelegate extends WatchUi.BehaviorDelegate {
 
     function onNextPage() {
         if (_view != null) {
-            _view.adjustSelection(1);
+            _view.adjustSelection(-1);
         }
 
         return true;
@@ -179,7 +182,7 @@ class SimpleEntryDelegate extends WatchUi.BehaviorDelegate {
 
     function onPreviousPage() {
         if (_view != null) {
-            _view.adjustSelection(-1);
+            _view.adjustSelection(1);
         }
 
         return true;
