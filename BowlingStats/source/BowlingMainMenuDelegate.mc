@@ -40,6 +40,7 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
                 theDelegate = new SimpleEntryDelegate(game, method(:onGameComplete));
             }
 
+            theDelegate.setView(view);
             WatchUi.pushView(view, theDelegate, WatchUi.SLIDE_IMMEDIATE);
 
         } else if (id.equals("togglemode")) {
