@@ -85,11 +85,11 @@ class SimpleEntryView extends WatchUi.View {
         var cardWidth = 118;
         var cardHeight = 88;
         var left = centerX - (cardWidth / 2);
-        var top = 36;
+        var top = 34;
         var rollBoxWidth = 34;
         var rollBoxHeight = 30;
-        var rollTop = top + 1;
         var rollLeft = left + cardWidth - (rollBoxWidth * 2);
+        var rollCenterY = top + (rollBoxHeight / 2);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         dc.drawRectangle(left, top, cardWidth, cardHeight);
@@ -98,9 +98,9 @@ class SimpleEntryView extends WatchUi.View {
         dc.drawLine(rollLeft, top + rollBoxHeight, left + cardWidth, top + rollBoxHeight);
 
         var frame = _game.getFrame(_game.getCurrentFrameNumber() - 1);
-        dc.drawText(left + 14, top + 9, Graphics.FONT_XTINY, _game.getCurrentFrameNumber().toString(), Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(rollLeft + (rollBoxWidth / 2), rollTop + 5, Graphics.FONT_SMALL, getRollLabel(frame, 0), Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(rollLeft + rollBoxWidth + (rollBoxWidth / 2), rollTop + 5, Graphics.FONT_SMALL, getRollLabel(frame, 1), Graphics.TEXT_JUSTIFY_CENTER);
+        drawCenteredText(dc, left + 15, rollCenterY, Graphics.FONT_XTINY, _game.getCurrentFrameNumber().toString());
+        drawCenteredText(dc, rollLeft + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 0));
+        drawCenteredText(dc, rollLeft + rollBoxWidth + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 1));
 
         var score = _game.getCumulativeScoreThrough(_game.getCurrentFrameNumber() - 1);
         var scoreText = score == null ? "" : score.toString();
@@ -112,7 +112,7 @@ class SimpleEntryView extends WatchUi.View {
     }
 
     private function drawPinSelector(dc, width, height) {
-        var y = height - 58;
+        var y = (height / 2) + 36;
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawText(width / 2, y, Graphics.FONT_XTINY, "Pins Down", Graphics.TEXT_JUSTIFY_CENTER);
 
@@ -120,8 +120,12 @@ class SimpleEntryView extends WatchUi.View {
         if (_game.isGameComplete()) {
             dc.drawText(width / 2, y + 20, Graphics.FONT_SMALL, "Select to finish", Graphics.TEXT_JUSTIFY_CENTER);
         } else {
-            dc.drawText(width / 2, y + 18, Graphics.FONT_NUMBER_HOT, _selectedPins.toString(), Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, y + 20, Graphics.FONT_LARGE, _selectedPins.toString(), Graphics.TEXT_JUSTIFY_CENTER);
         }
+    }
+
+    private function drawCenteredText(dc, x, y, font, text) {
+        dc.drawText(x, y, font, text, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
     private function getRollLabel(frame, rollIndex) {
