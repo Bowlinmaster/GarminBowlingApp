@@ -55,7 +55,6 @@ class SimpleEntryView extends WatchUi.View {
         var height = dc.getHeight();
         var centerX = width / 2;
 
-        drawHeader(dc, width);
         drawFrameCard(dc, centerX, height);
         drawPinSelector(dc, width, height);
     }
@@ -71,47 +70,61 @@ class SimpleEntryView extends WatchUi.View {
         }
     }
 
-    private function drawHeader(dc, width) {
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-
-        var title;
-        if (_game.isGameComplete()) {
-            title = "Game Complete";
-        } else {
-            title = "Frame " + _game.getCurrentFrameNumber() + "  Ball " + _game.getCurrentBallNumber();
-        }
-
-        dc.drawText(width / 2, 8, Graphics.FONT_XTINY, title, Graphics.TEXT_JUSTIFY_CENTER);
-    }
-
     private function drawFrameCard(dc, centerX, height) {
         var cardWidth = 118;
-        var cardHeight = 88;
+        var headerHeight = 22;
+        var bodyHeight = 82;
         var left = centerX - (cardWidth / 2);
-        var top = 34;
+        var top = 26;
+        var bodyTop = top + headerHeight;
         var rollBoxWidth = 34;
         var rollBoxHeight = 30;
-        var rollLeft = left + cardWidth - (rollBoxWidth * 2);
-        var rollCenterY = top + (rollBoxHeight / 2);
+        var rollCenterY = bodyTop + (rollBoxHeight / 2);
+        var frameNumber = _game.getCurrentFrameNumber();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawRectangle(left, top, cardWidth, cardHeight);
-        dc.drawLine(rollLeft, top, rollLeft, top + rollBoxHeight);
-        dc.drawLine(rollLeft + rollBoxWidth, top, rollLeft + rollBoxWidth, top + rollBoxHeight);
-        dc.drawLine(rollLeft, top + rollBoxHeight, left + cardWidth, top + rollBoxHeight);
+        dc.drawRectangle(left, top, cardWidth, headerHeight);
+        dc.drawRectangle(left, bodyTop, cardWidth, bodyHeight);
+        drawCenteredText(dc, centerX, top + (headerHeight / 2), Graphics.FONT_XTINY, frameNumber.toString());
 
-        var frame = _game.getFrame(_game.getCurrentFrameNumber() - 1);
-        drawCenteredText(dc, left + 15, rollCenterY, Graphics.FONT_XTINY, _game.getCurrentFrameNumber().toString());
-        drawCenteredText(dc, rollLeft + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 0));
-        drawCenteredText(dc, rollLeft + rollBoxWidth + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 1));
+        var frame = _game.getFrame(frameNumber - 1);
+        if (frameNumber == 10) {
+            drawTenthFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY);
+        } else {
+            drawStandardFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY);
+        }
 
-        var score = _game.getCumulativeScoreThrough(_game.getCurrentFrameNumber() - 1);
+        var score = _game.getCumulativeScoreThrough(frameNumber - 1);
         var scoreText = score == null ? "" : score.toString();
         if (_game.isGameComplete()) {
             scoreText = _game.getScore().toString();
         }
 
-        dc.drawText(centerX, top + 48, Graphics.FONT_LARGE, scoreText, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(centerX, bodyTop + 48, Graphics.FONT_LARGE, scoreText, Graphics.TEXT_JUSTIFY_CENTER);
+    }
+
+    private function drawStandardFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY) {
+        var boxLeft = left + cardWidth - rollBoxWidth;
+        dc.drawRectangle(boxLeft, bodyTop, rollBoxWidth, rollBoxHeight);
+
+        if (frame.isStrike()) {
+            drawCenteredText(dc, boxLeft + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, "X");
+        } else {
+            drawCenteredText(dc, boxLeft - 18, rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 0));
+            drawCenteredText(dc, boxLeft + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 1));
+        }
+    }
+
+    private function drawTenthFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY) {
+        var firstBoxLeft = left + cardWidth - (rollBoxWidth * 2);
+        var secondBoxLeft = firstBoxLeft + rollBoxWidth;
+
+        dc.drawRectangle(firstBoxLeft, bodyTop, rollBoxWidth, rollBoxHeight);
+        dc.drawRectangle(secondBoxLeft, bodyTop, rollBoxWidth, rollBoxHeight);
+
+        drawCenteredText(dc, firstBoxLeft - 18, rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 0));
+        drawCenteredText(dc, firstBoxLeft + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 1));
+        drawCenteredText(dc, secondBoxLeft + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 2));
     }
 
     private function drawPinSelector(dc, width, height) {
@@ -148,6 +161,14 @@ class SimpleEntryView extends WatchUi.View {
         if (rollIndex == 1) {
             var first = frame.getPinsAt(0);
             if (first != null && first < 10 && (first + pins) == 10) {
+                return "/";
+            }
+        }
+
+        if (rollIndex == 2) {
+            var firstRoll = frame.getPinsAt(0);
+            var secondRoll = frame.getPinsAt(1);
+            if (firstRoll == 10 && secondRoll != null && secondRoll < 10 && (secondRoll + pins) == 10) {
                 return "/";
             }
         }
