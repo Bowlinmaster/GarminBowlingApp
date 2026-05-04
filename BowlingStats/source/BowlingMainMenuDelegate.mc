@@ -10,9 +10,6 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
         
     }
 
-    //When an item is selected from the main menu, go to the next view based on the selection.
-    //Option 1: New Game (newgame)
-    //Option 2: View Games (viewgames)
     public function onSelect(item as MenuItem) as Void {
         var id = item.getId() as String;
 
@@ -43,21 +40,11 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
             theDelegate.setView(view);
             WatchUi.pushView(view, theDelegate, WatchUi.SLIDE_IMMEDIATE);
 
-        } else if (id.equals("togglemode")) {
-            var app = $.getApp();
-            System.println("Selected Togglemode");
-            //Toggle the entry mode.
-            app.usePinEntryMode = !app.usePinEntryMode;
-            System.println("Mode is now: " + app.usePinEntryMode);
-            var newMenu = app.buildMainMenu();
-            WatchUi.switchToView(newMenu, new $.BowlingMainMenu2Delegate(), WatchUi.SLIDE_IMMEDIATE);
-            //How do I refresh the visual of the menu?
-            //System.println("Selected View Games");
-            //Now go into the view that allows you to scroll through completed games.
-            //TODO: Look at already completed games
-            return;
         } else if (id.equals("viewgames")) {
             System.println("Selected view games");
+        } else if (id.equals("settings")) {
+            var settingsMenu = $.getApp().buildSettingsMenu();
+            WatchUi.pushView(settingsMenu, new $.BowlingSettingsMenuDelegate(), WatchUi.SLIDE_IMMEDIATE);
         }
     }
 

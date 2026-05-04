@@ -3,6 +3,9 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 class BowlingStatsApp extends Application.AppBase {
+    const ENTRY_MODE_STORAGE_KEY = "entryMode";
+    const ENTRY_MODE_SIMPLE = "simple";
+    const ENTRY_MODE_PIN = "pin";
 
     //I need to be able to access the player from throughout the app, so set player as a member of the Application.
     //var player as Player?;
@@ -18,6 +21,7 @@ class BowlingStatsApp extends Application.AppBase {
     // onStart() is called on application start up
     function onStart(state as Dictionary?) as Void {
         System.println("App - onStart()");
+        loadSettings();
 
         //player = new Player("Player1");
         /*
@@ -67,12 +71,36 @@ class BowlingStatsApp extends Application.AppBase {
 
     function buildMainMenu() as WatchUi.Menu2 {
         var menu = new WatchUi.Menu2({ :title => "Bowling" });
-        var modeText = self.usePinEntryMode ? "Pin" : "Simple";
-        menu.addItem(new WatchUi.MenuItem("Entry Mode: " + (modeText), null, "togglemode", null));
         menu.addItem(new WatchUi.MenuItem("Start New Game", null, "newgame", null));
         menu.addItem(new WatchUi.MenuItem("View Games", null, "viewgames", null));
+        menu.addItem(new WatchUi.MenuItem("Settings", null, "settings", null));
 
         return menu;
+    }
+
+    function buildSettingsMenu() as WatchUi.Menu2 {
+        var menu = new WatchUi.Menu2({ :title => "Settings" });
+        menu.addItem(new WatchUi.MenuItem("Entry Mode: " + getEntryModeLabel(), null, "togglemode", null));
+
+        return menu;
+    }
+
+    function getEntryModeLabel() {
+        return usePinEntryMode ? "Pin" : "Simple";
+    }
+
+    function toggleEntryMode() {
+        setUsePinEntryMode(!usePinEntryMode);
+    }
+
+    function setUsePinEntryMode(value) {
+        usePinEntryMode = value;
+        Application.Storage.setValue(ENTRY_MODE_STORAGE_KEY, usePinEntryMode ? ENTRY_MODE_PIN : ENTRY_MODE_SIMPLE);
+    }
+
+    private function loadSettings() {
+        var entryMode = Application.Storage.getValue(ENTRY_MODE_STORAGE_KEY);
+        usePinEntryMode = entryMode == ENTRY_MODE_PIN;
     }
 
 }
