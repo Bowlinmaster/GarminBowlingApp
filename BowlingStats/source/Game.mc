@@ -2,6 +2,7 @@ import Toybox.Lang;
 
 class BowlingThrow {
     var pins;
+    // Reserved for future per-pin entry; score calculation only needs the count.
     var pinMask;
 
     function initialize(pinCount, knockedDownPinMask) {
