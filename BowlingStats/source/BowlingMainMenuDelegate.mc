@@ -39,5 +39,6 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
     }
 
     public function onGameComplete() as Void {
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 }
