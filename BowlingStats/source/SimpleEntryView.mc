@@ -54,9 +54,10 @@ class SimpleEntryView extends WatchUi.View {
         var width = dc.getWidth();
         var height = dc.getHeight();
         var centerX = width / 2;
+        var layout = BowlingEntryLayoutProfiles.forDevice(width, height);
 
-        drawFrameCard(dc, centerX, height);
-        drawPinSelector(dc, width, height);
+        drawFrameCard(dc, centerX, layout);
+        drawPinSelector(dc, width, height, layout);
     }
 
     private function clampSelection() {
@@ -70,28 +71,28 @@ class SimpleEntryView extends WatchUi.View {
         }
     }
 
-    private function drawFrameCard(dc, centerX, height) {
-        var cardWidth = 118;
-        var headerHeight = 22;
-        var bodyHeight = 82;
+    private function drawFrameCard(dc, centerX, layout) {
+        var cardWidth = layout.cardWidth;
+        var headerHeight = layout.headerHeight;
+        var bodyHeight = layout.bodyHeight;
         var left = centerX - (cardWidth / 2);
-        var top = 26;
+        var top = layout.top;
         var bodyTop = top + headerHeight;
-        var rollBoxWidth = 34;
-        var rollBoxHeight = 30;
+        var rollBoxWidth = layout.rollBoxWidth;
+        var rollBoxHeight = layout.rollBoxHeight;
         var rollCenterY = bodyTop + (rollBoxHeight / 2);
         var frameNumber = _game.getCurrentFrameNumber();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         dc.drawRectangle(left, top, cardWidth, headerHeight);
         dc.drawRectangle(left, bodyTop, cardWidth, bodyHeight);
-        drawCenteredText(dc, centerX, top + (headerHeight / 2), Graphics.FONT_XTINY, frameNumber.toString());
+        drawCenteredText(dc, centerX, top + (headerHeight / 2), layout.frameNumberFont, frameNumber.toString());
 
         var frame = _game.getFrame(frameNumber - 1);
         if (frameNumber == 10) {
-            drawTenthFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY);
+            drawTenthFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout);
         } else {
-            drawStandardFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY);
+            drawStandardFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout);
         }
 
         var score = _game.getCumulativeScoreThrough(frameNumber - 1);
@@ -100,43 +101,43 @@ class SimpleEntryView extends WatchUi.View {
             scoreText = _game.getScore().toString();
         }
 
-        dc.drawText(centerX, bodyTop + 48, Graphics.FONT_LARGE, scoreText, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(centerX, bodyTop + layout.scoreYOffset, layout.scoreFont, scoreText, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
-    private function drawStandardFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY) {
+    private function drawStandardFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout) {
         var boxLeft = left + cardWidth - rollBoxWidth;
         dc.drawRectangle(boxLeft, bodyTop, rollBoxWidth, rollBoxHeight);
 
         if (frame.isStrike()) {
-            drawCenteredText(dc, boxLeft + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, "X");
+            drawCenteredText(dc, boxLeft + (rollBoxWidth / 2), rollCenterY, layout.rollFont, "X");
         } else {
-            drawCenteredText(dc, boxLeft - 18, rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 0));
-            drawCenteredText(dc, boxLeft + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 1));
+            drawCenteredText(dc, boxLeft - layout.firstRollOffset, rollCenterY, layout.rollFont, getRollLabel(frame, 0));
+            drawCenteredText(dc, boxLeft + (rollBoxWidth / 2), rollCenterY, layout.rollFont, getRollLabel(frame, 1));
         }
     }
 
-    private function drawTenthFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY) {
+    private function drawTenthFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout) {
         var firstBoxLeft = left + cardWidth - (rollBoxWidth * 2);
         var secondBoxLeft = firstBoxLeft + rollBoxWidth;
 
         dc.drawRectangle(firstBoxLeft, bodyTop, rollBoxWidth, rollBoxHeight);
         dc.drawRectangle(secondBoxLeft, bodyTop, rollBoxWidth, rollBoxHeight);
 
-        drawCenteredText(dc, firstBoxLeft - 18, rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 0));
-        drawCenteredText(dc, firstBoxLeft + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 1));
-        drawCenteredText(dc, secondBoxLeft + (rollBoxWidth / 2), rollCenterY, Graphics.FONT_SMALL, getRollLabel(frame, 2));
+        drawCenteredText(dc, firstBoxLeft - layout.firstRollOffset, rollCenterY, layout.rollFont, getRollLabel(frame, 0));
+        drawCenteredText(dc, firstBoxLeft + (rollBoxWidth / 2), rollCenterY, layout.rollFont, getRollLabel(frame, 1));
+        drawCenteredText(dc, secondBoxLeft + (rollBoxWidth / 2), rollCenterY, layout.rollFont, getRollLabel(frame, 2));
     }
 
-    private function drawPinSelector(dc, width, height) {
-        var y = (height / 2) + 36;
+    private function drawPinSelector(dc, width, height, layout) {
+        var y = (height / 2) + layout.selectorYOffset;
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, y, Graphics.FONT_XTINY, "Pins Down", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, y, layout.selectorLabelFont, "Pins Down", Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         if (_game.isGameComplete()) {
-            dc.drawText(width / 2, y + 20, Graphics.FONT_SMALL, "Select to finish", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, y + layout.selectorValueOffset, layout.finishFont, "Select to finish", Graphics.TEXT_JUSTIFY_CENTER);
         } else {
-            dc.drawText(width / 2, y + 20, Graphics.FONT_LARGE, _selectedPins.toString(), Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, y + layout.selectorValueOffset, layout.selectorValueFont, _selectedPins.toString(), Graphics.TEXT_JUSTIFY_CENTER);
         }
     }
 
