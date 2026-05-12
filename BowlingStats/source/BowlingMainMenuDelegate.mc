@@ -32,6 +32,8 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
             WatchUi.pushView(view, theDelegate, WatchUi.SLIDE_IMMEDIATE);
 
         } else if (id.equals("viewgames")) {
+            var savedGamesView = new SavedGamesView();
+            WatchUi.pushView(savedGamesView, new SavedGamesDelegate(savedGamesView), WatchUi.SLIDE_IMMEDIATE);
         } else if (id.equals("settings")) {
             var settingsMenu = $.getApp().buildSettingsMenu();
             WatchUi.pushView(settingsMenu, new $.BowlingSettingsMenuDelegate(), WatchUi.SLIDE_IMMEDIATE);
