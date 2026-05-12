@@ -58,6 +58,7 @@ class SimpleEntryView extends WatchUi.View {
 
         drawFrameCard(dc, centerX, layout);
         drawPinSelector(dc, width, height, layout);
+        drawConfirmHint(dc, width, height, layout);
     }
 
     private function clampSelection() {
@@ -89,43 +90,44 @@ class SimpleEntryView extends WatchUi.View {
         drawCenteredText(dc, centerX, top + (headerHeight / 2), layout.frameNumberFont, frameNumber.toString());
 
         var frame = _game.getFrame(frameNumber - 1);
+        var pendingRollIndex = getPendingRollIndex(frame);
         if (frameNumber == 10) {
-            drawTenthFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout);
+            drawTenthFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout);
         } else {
-            drawStandardFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout);
+            drawStandardFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout);
         }
 
-        var score = _game.getCumulativeScoreThrough(frameNumber - 1);
-        var scoreText = score == null ? "" : score.toString();
+        var score = _game.getPotentialScoreForCurrentThrow(_selectedPins);
         if (_game.isGameComplete()) {
-            scoreText = _game.getScore().toString();
+            score = _game.getScore();
         }
 
+        var scoreText = score == null ? "" : score.toString();
         dc.drawText(centerX, bodyTop + layout.scoreYOffset, layout.scoreFont, scoreText, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
-    private function drawStandardFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout) {
+    private function drawStandardFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout) {
         var boxLeft = left + cardWidth - rollBoxWidth;
         dc.drawRectangle(boxLeft, bodyTop, rollBoxWidth, rollBoxHeight);
 
-        if (frame.isStrike()) {
+        if (getRollPins(frame, 0, pendingRollIndex) == 10) {
             drawCenteredText(dc, boxLeft + (rollBoxWidth / 2), rollCenterY, layout.rollFont, "X");
         } else {
-            drawCenteredText(dc, boxLeft - layout.firstRollOffset, rollCenterY, layout.rollFont, getRollLabel(frame, 0));
-            drawCenteredText(dc, boxLeft + (rollBoxWidth / 2), rollCenterY, layout.rollFont, getRollLabel(frame, 1));
+            drawCenteredText(dc, boxLeft - layout.firstRollOffset, rollCenterY, layout.rollFont, getRollLabel(frame, 0, pendingRollIndex));
+            drawCenteredText(dc, boxLeft + (rollBoxWidth / 2), rollCenterY, layout.rollFont, getRollLabel(frame, 1, pendingRollIndex));
         }
     }
 
-    private function drawTenthFrameRolls(dc, frame, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout) {
+    private function drawTenthFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout) {
         var firstBoxLeft = left + cardWidth - (rollBoxWidth * 2);
         var secondBoxLeft = firstBoxLeft + rollBoxWidth;
 
         dc.drawRectangle(firstBoxLeft, bodyTop, rollBoxWidth, rollBoxHeight);
         dc.drawRectangle(secondBoxLeft, bodyTop, rollBoxWidth, rollBoxHeight);
 
-        drawCenteredText(dc, firstBoxLeft - layout.firstRollOffset, rollCenterY, layout.rollFont, getRollLabel(frame, 0));
-        drawCenteredText(dc, firstBoxLeft + (rollBoxWidth / 2), rollCenterY, layout.rollFont, getRollLabel(frame, 1));
-        drawCenteredText(dc, secondBoxLeft + (rollBoxWidth / 2), rollCenterY, layout.rollFont, getRollLabel(frame, 2));
+        drawCenteredText(dc, firstBoxLeft - layout.firstRollOffset, rollCenterY, layout.rollFont, getRollLabel(frame, 0, pendingRollIndex));
+        drawCenteredText(dc, firstBoxLeft + (rollBoxWidth / 2), rollCenterY, layout.rollFont, getRollLabel(frame, 1, pendingRollIndex));
+        drawCenteredText(dc, secondBoxLeft + (rollBoxWidth / 2), rollCenterY, layout.rollFont, getRollLabel(frame, 2, pendingRollIndex));
     }
 
     private function drawPinSelector(dc, width, height, layout) {
@@ -141,12 +143,51 @@ class SimpleEntryView extends WatchUi.View {
         }
     }
 
+    private function drawConfirmHint(dc, width, height, layout) {
+        if (_game.isGameComplete()) {
+            return;
+        }
+
+        var x = width - layout.confirmIconRightInset;
+        var y = (height / 2) - layout.confirmIconYOffset;
+        var size = layout.confirmIconSize;
+        var stemX = x - (size / 6);
+        var stemY = y + (size / 3);
+
+        dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(layout.confirmIconPenWidth);
+        dc.drawLine(x - (size / 2), y, stemX, stemY);
+        dc.drawLine(stemX, stemY, x + (size / 2), y - (size / 2));
+        dc.setPenWidth(1);
+    }
+
     private function drawCenteredText(dc, x, y, font, text) {
         dc.drawText(x, y, font, text, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
-    private function getRollLabel(frame, rollIndex) {
+    private function getPendingRollIndex(frame) {
+        if (_game.isGameComplete()) {
+            return null;
+        }
+
+        return frame.getRollCount();
+    }
+
+    private function getRollPins(frame, rollIndex, pendingRollIndex) {
         var pins = frame.getPinsAt(rollIndex);
+        if (pins != null) {
+            return pins;
+        }
+
+        if (pendingRollIndex != null && rollIndex == pendingRollIndex) {
+            return _selectedPins;
+        }
+
+        return null;
+    }
+
+    private function getRollLabel(frame, rollIndex, pendingRollIndex) {
+        var pins = getRollPins(frame, rollIndex, pendingRollIndex);
         if (pins == null) {
             return "";
         }
@@ -155,23 +196,23 @@ class SimpleEntryView extends WatchUi.View {
             return "-";
         }
 
-        if (pins == 10) {
-            return "X";
-        }
-
         if (rollIndex == 1) {
-            var first = frame.getPinsAt(0);
+            var first = getRollPins(frame, 0, pendingRollIndex);
             if (first != null && first < 10 && (first + pins) == 10) {
                 return "/";
             }
         }
 
         if (rollIndex == 2) {
-            var firstRoll = frame.getPinsAt(0);
-            var secondRoll = frame.getPinsAt(1);
+            var firstRoll = getRollPins(frame, 0, pendingRollIndex);
+            var secondRoll = getRollPins(frame, 1, pendingRollIndex);
             if (firstRoll == 10 && secondRoll != null && secondRoll < 10 && (secondRoll + pins) == 10) {
                 return "/";
             }
+        }
+
+        if (pins == 10) {
+            return "X";
         }
 
         return pins.toString();

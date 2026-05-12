@@ -13,6 +13,10 @@ class BowlingEntryLayoutProfile {
     var scoreYOffset;
     var selectorYOffset;
     var selectorValueOffset;
+    var confirmIconRightInset;
+    var confirmIconYOffset;
+    var confirmIconSize;
+    var confirmIconPenWidth;
     var frameNumberFont;
     var rollFont;
     var scoreFont;
@@ -32,6 +36,10 @@ class BowlingEntryLayoutProfile {
         scoreYOffset = options[:scoreYOffset];
         selectorYOffset = options[:selectorYOffset];
         selectorValueOffset = options[:selectorValueOffset];
+        confirmIconRightInset = options[:confirmIconRightInset];
+        confirmIconYOffset = options[:confirmIconYOffset];
+        confirmIconSize = options[:confirmIconSize];
+        confirmIconPenWidth = options[:confirmIconPenWidth];
         frameNumberFont = options[:frameNumberFont];
         rollFont = options[:rollFont];
         scoreFont = options[:scoreFont];
@@ -225,6 +233,10 @@ class BowlingEntryLayoutProfiles {
             :scoreYOffset => 44,
             :selectorYOffset => 36,
             :selectorValueOffset => 20,
+            :confirmIconRightInset => 42,
+            :confirmIconYOffset => 58,
+            :confirmIconSize => 18,
+            :confirmIconPenWidth => 3,
             :frameNumberFont => Graphics.FONT_XTINY,
             :rollFont => Graphics.FONT_SMALL,
             :scoreFont => Graphics.FONT_LARGE,
@@ -371,6 +383,9 @@ class BowlingEntryLayoutProfiles {
         profile.firstRollOffset = 17;
         profile.scoreYOffset = 42;
         profile.selectorYOffset = 32;
+        profile.confirmIconRightInset = 38;
+        profile.confirmIconYOffset = 54;
+        profile.confirmIconSize = 16;
         return profile;
     }
 
@@ -392,6 +407,9 @@ class BowlingEntryLayoutProfiles {
         profile.firstRollOffset = 14;
         profile.scoreYOffset = 38;
         profile.selectorYOffset = 24;
+        profile.confirmIconRightInset = 30;
+        profile.confirmIconYOffset = 46;
+        profile.confirmIconSize = 14;
         return profile;
     }
 
@@ -406,6 +424,9 @@ class BowlingEntryLayoutProfiles {
         profile.rollBoxHeight = 32;
         profile.scoreYOffset = 54;
         profile.selectorYOffset = 44;
+        profile.confirmIconRightInset = 50;
+        profile.confirmIconYOffset = 76;
+        profile.confirmIconSize = 20;
         return profile;
     }
 
@@ -416,6 +437,9 @@ class BowlingEntryLayoutProfiles {
         profile.top = 34;
         profile.scoreYOffset = 56;
         profile.selectorYOffset = 46;
+        profile.confirmIconRightInset = 54;
+        profile.confirmIconYOffset = 82;
+        profile.confirmIconSize = 20;
         return profile;
     }
 
@@ -426,6 +450,9 @@ class BowlingEntryLayoutProfiles {
         profile.top = 35;
         profile.scoreYOffset = 56;
         profile.selectorYOffset = 48;
+        profile.confirmIconRightInset = 58;
+        profile.confirmIconYOffset = 86;
+        profile.confirmIconSize = 22;
         return profile;
     }
 
@@ -446,6 +473,9 @@ class BowlingEntryLayoutProfiles {
         profile.rollBoxHeight = 32;
         profile.scoreYOffset = 52;
         profile.selectorYOffset = 38;
+        profile.confirmIconRightInset = 36;
+        profile.confirmIconYOffset = 74;
+        profile.confirmIconSize = 18;
         return profile;
     }
 
@@ -462,6 +492,10 @@ class BowlingEntryLayoutProfiles {
             :scoreYOffset => 42,
             :selectorYOffset => 30,
             :selectorValueOffset => 18,
+            :confirmIconRightInset => 34,
+            :confirmIconYOffset => 50,
+            :confirmIconSize => 15,
+            :confirmIconPenWidth => 3,
             :frameNumberFont => Graphics.FONT_XTINY,
             :rollFont => Graphics.FONT_XTINY,
             :scoreFont => Graphics.FONT_MEDIUM,
@@ -484,6 +518,10 @@ class BowlingEntryLayoutProfiles {
             :scoreYOffset => 58,
             :selectorYOffset => 50,
             :selectorValueOffset => 24,
+            :confirmIconRightInset => 62,
+            :confirmIconYOffset => 94,
+            :confirmIconSize => 24,
+            :confirmIconPenWidth => 4,
             :frameNumberFont => Graphics.FONT_XTINY,
             :rollFont => Graphics.FONT_SMALL,
             :scoreFont => Graphics.FONT_LARGE,

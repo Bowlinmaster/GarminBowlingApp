@@ -290,6 +290,18 @@ class BowlingGame {
         return score;
     }
 
+    function getPotentialScoreForCurrentThrow(pinCount) {
+        if (isComplete) {
+            return getScore();
+        }
+
+        if (!isLegalPinCount(pinCount)) {
+            return null;
+        }
+
+        return getPotentialScoreThrough(currentFrame, pinCount);
+    }
+
     function isGameComplete() {
         return isComplete;
     }
@@ -333,6 +345,112 @@ class BowlingGame {
         }
 
         return nextRolls;
+    }
+
+    private function getPotentialScoreThrough(index, pendingPinCount) {
+        var score = 0;
+        for (var i = 0; i <= index; i++) {
+            var frameScore = getPotentialFrameScore(i, pendingPinCount);
+            if (frameScore == null) {
+                return null;
+            }
+
+            score += frameScore;
+        }
+
+        return score;
+    }
+
+    private function getPotentialFrameScore(index, pendingPinCount) {
+        var first = getPotentialPinsAt(index, 0, pendingPinCount);
+        if (first == null) {
+            return null;
+        }
+
+        if (index == 9) {
+            return getPotentialFrameTotal(index, pendingPinCount);
+        }
+
+        if (first == 10) {
+            var strikeBonus = getPotentialNextRolls(index, 2, pendingPinCount);
+            var strikeScore = 10;
+            for (var strikeIndex = 0; strikeIndex < strikeBonus.size(); strikeIndex++) {
+                strikeScore += strikeBonus[strikeIndex];
+            }
+
+            return strikeScore;
+        }
+
+        var second = getPotentialPinsAt(index, 1, pendingPinCount);
+        if (second == null) {
+            return first;
+        }
+
+        if ((first + second) == 10) {
+            var spareBonus = getPotentialNextRolls(index, 1, pendingPinCount);
+            if (spareBonus.size() == 0) {
+                return 10;
+            }
+
+            return 10 + spareBonus[0];
+        }
+
+        return first + second;
+    }
+
+    private function getPotentialFrameTotal(index, pendingPinCount) {
+        var total = 0;
+        var rollCount = getPotentialRollCount(index);
+        for (var roll = 0; roll < rollCount; roll++) {
+            var pins = getPotentialPinsAt(index, roll, pendingPinCount);
+            if (pins != null) {
+                total += pins;
+            }
+        }
+
+        return total;
+    }
+
+    private function getPotentialNextRolls(frameIndex, count, pendingPinCount) {
+        var nextRolls = [];
+        var index = frameIndex + 1;
+
+        while (index < 10 && nextRolls.size() < count) {
+            var rollCount = getPotentialRollCount(index);
+            for (var roll = 0; roll < rollCount && nextRolls.size() < count; roll++) {
+                var pins = getPotentialPinsAt(index, roll, pendingPinCount);
+                if (pins != null) {
+                    nextRolls.add(pins);
+                }
+            }
+
+            index += 1;
+        }
+
+        return nextRolls;
+    }
+
+    private function getPotentialRollCount(index) {
+        var rollCount = frames[index].getRollCount();
+        if (!isComplete && index == currentFrame) {
+            return rollCount + 1;
+        }
+
+        return rollCount;
+    }
+
+    private function getPotentialPinsAt(index, rollIndex, pendingPinCount) {
+        var frame = frames[index];
+        var pins = frame.getPinsAt(rollIndex);
+        if (pins != null) {
+            return pins;
+        }
+
+        if (!isComplete && index == currentFrame && rollIndex == frame.getRollCount()) {
+            return pendingPinCount;
+        }
+
+        return null;
     }
 }
 

@@ -85,3 +85,22 @@ function testLegalPinsForSecondThrow(logger) {
 
     return game.getPinsRemaining() == 4 && !game.recordThrow(5) && game.recordThrow(4);
 }
+
+(:test)
+function testPotentialScoreForCurrentThrow(logger) {
+    var game = new BowlingGame();
+    game.recordThrow(7);
+    game.recordThrow(3);
+
+    return game.getPotentialScoreForCurrentThrow(5) == 20;
+}
+
+(:test)
+function testPotentialPerfectGameScore(logger) {
+    var game = new BowlingGame();
+    for (var i = 0; i < 11; i++) {
+        game.recordThrow(10);
+    }
+
+    return !game.isGameComplete() && game.getPotentialScoreForCurrentThrow(10) == 300;
+}
