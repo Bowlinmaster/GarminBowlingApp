@@ -161,3 +161,19 @@ function testSavedGameStoreSavesAndReadsCompletedGame(logger) {
            games[0][BOWLING_SAVED_GAME_SAVED_AT] == 1770000200 &&
            games[0][BOWLING_SAVED_GAME_SCORE] == 300;
 }
+
+(:test)
+function testSavedGameStoreClearsGames(logger) {
+    BowlingSavedGameStore.clearSavedGames();
+
+    var game = new BowlingGame();
+    for (var i = 0; i < 12; i++) {
+        game.recordThrow(10);
+    }
+
+    BowlingSavedGameStore.saveGameAt(game, 1770000300);
+    var savedCount = BowlingSavedGameStore.getSavedGameCount();
+    BowlingSavedGameStore.clearSavedGames();
+
+    return savedCount == 1 && BowlingSavedGameStore.getSavedGameCount() == 0;
+}

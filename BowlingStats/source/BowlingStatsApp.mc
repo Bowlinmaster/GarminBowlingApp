@@ -37,6 +37,7 @@ class BowlingStatsApp extends Application.AppBase {
     function buildSettingsMenu() as WatchUi.Menu2 {
         var menu = new WatchUi.Menu2({ :title => "Settings" });
         menu.addItem(new WatchUi.MenuItem("Entry Mode: " + getEntryModeLabel(), null, "togglemode", null));
+        menu.addItem(new WatchUi.MenuItem("Clear Saved Games", null, "cleargames", null));
 
         return menu;
     }

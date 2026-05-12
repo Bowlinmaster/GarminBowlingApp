@@ -15,6 +15,9 @@ class BowlingSettingsMenuDelegate extends WatchUi.Menu2InputDelegate {
 
             var settingsMenu = app.buildSettingsMenu();
             WatchUi.switchToView(settingsMenu, new $.BowlingSettingsMenuDelegate(), WatchUi.SLIDE_IMMEDIATE);
+        } else if (id.equals("cleargames")) {
+            var confirmation = new WatchUi.Confirmation("Clear saved games?");
+            WatchUi.pushView(confirmation, new $.BowlingClearSavedGamesConfirmationDelegate(), WatchUi.SLIDE_IMMEDIATE);
         }
     }
 
