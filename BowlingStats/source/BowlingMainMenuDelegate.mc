@@ -2,8 +2,11 @@ import Toybox.WatchUi;
 import Toybox.Lang;
 
 class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
+    var _activeGame;
+
     public function initialize() {
         WatchUi.Menu2InputDelegate.initialize();
+        _activeGame = null;
     }
 
     public function onSelect(item as MenuItem) as Void {
@@ -13,6 +16,7 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
             var app = $.getApp();
 
             var game = new Game();
+            _activeGame = game;
             var view;
             var theDelegate;
             if(app.usePinEntryMode){
@@ -39,6 +43,11 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
     }
 
     public function onGameComplete() as Void {
+        if (_activeGame != null) {
+            BowlingSavedGameStore.saveGame(_activeGame);
+            _activeGame = null;
+        }
+
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 }

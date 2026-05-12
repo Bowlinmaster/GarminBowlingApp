@@ -231,6 +231,31 @@ class BowlingGame {
         return frames[index];
     }
 
+    function getRecordedRollCount() {
+        var rollCount = 0;
+        for (var frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
+            rollCount += frames[frameIndex].getRollCount();
+        }
+
+        return rollCount;
+    }
+
+    function getRecordedPinsAt(rollIndex) {
+        var currentRoll = 0;
+        for (var frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
+            var frame = frames[frameIndex];
+            for (var frameRoll = 0; frameRoll < frame.getRollCount(); frameRoll++) {
+                if (currentRoll == rollIndex) {
+                    return frame.getPinsAt(frameRoll);
+                }
+
+                currentRoll += 1;
+            }
+        }
+
+        return null;
+    }
+
     function getScore() {
         var score = 0;
         for (var i = 0; i < 10; i++) {

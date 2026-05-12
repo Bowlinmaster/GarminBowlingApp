@@ -104,3 +104,60 @@ function testPotentialPerfectGameScore(logger) {
 
     return !game.isGameComplete() && game.getPotentialScoreForCurrentThrow(10) == 300;
 }
+
+(:test)
+function testSavedGameRecordPacksPerfectGame(logger) {
+    var game = new BowlingGame();
+    for (var i = 0; i < 12; i++) {
+        game.recordThrow(10);
+    }
+
+    var record = BowlingSavedGameStore.buildRecord(game, 1770000000);
+    var decoded = BowlingSavedGameStore.decodeRecord(record, 0);
+    var pins = decoded[BOWLING_SAVED_GAME_PIN_COUNTS];
+
+    return record.size() == BOWLING_SAVED_GAME_RECORD_SIZE &&
+           decoded[BOWLING_SAVED_GAME_SAVED_AT] == 1770000000 &&
+           decoded[BOWLING_SAVED_GAME_SCORE] == 300 &&
+           decoded[BOWLING_SAVED_GAME_ROLL_COUNT] == 12 &&
+           pins.size() == 12 &&
+           pins[0] == 10 &&
+           pins[11] == 10;
+}
+
+(:test)
+function testSavedGameRecordPacksMaxRollCount(logger) {
+    var game = new BowlingGame();
+    for (var i = 0; i < 21; i++) {
+        game.recordThrow(5);
+    }
+
+    var record = BowlingSavedGameStore.buildRecord(game, 1770000100);
+    var decoded = BowlingSavedGameStore.decodeRecord(record, 0);
+    var pins = decoded[BOWLING_SAVED_GAME_PIN_COUNTS];
+
+    return game.isGameComplete() &&
+           game.getScore() == 150 &&
+           decoded[BOWLING_SAVED_GAME_ROLL_COUNT] == 21 &&
+           pins.size() == 21 &&
+           pins[20] == 5;
+}
+
+(:test)
+function testSavedGameStoreSavesAndReadsCompletedGame(logger) {
+    BowlingSavedGameStore.clearSavedGames();
+
+    var game = new BowlingGame();
+    for (var i = 0; i < 12; i++) {
+        game.recordThrow(10);
+    }
+
+    var saved = BowlingSavedGameStore.saveGameAt(game, 1770000200);
+    var games = BowlingSavedGameStore.getSavedGames();
+    BowlingSavedGameStore.clearSavedGames();
+
+    return saved &&
+           games.size() == 1 &&
+           games[0][BOWLING_SAVED_GAME_SAVED_AT] == 1770000200 &&
+           games[0][BOWLING_SAVED_GAME_SCORE] == 300;
+}
