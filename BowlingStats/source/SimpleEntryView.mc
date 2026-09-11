@@ -4,13 +4,26 @@ using Toybox.WatchUi;
 class SimpleEntryView extends WatchUi.View {
     var _game;
     var _onComplete;
+    var _onDiscard;
     var _selectedPins;
+    var _saveFailed;
+    var _discardRequested;
 
-    function initialize(game, onComplete) {
+    function initialize(game, onComplete, onDiscard) {
         WatchUi.View.initialize();
         _game = game;
         _onComplete = onComplete;
+        _onDiscard = onDiscard;
+        _saveFailed = false;
+        _discardRequested = false;
         resetSelectionToMax();
+    }
+
+    function onShow() {
+        if (_discardRequested && _onDiscard != null) {
+            _discardRequested = false;
+            _onDiscard.invoke();
+        }
     }
 
     function adjustSelection(delta) {
@@ -22,7 +35,10 @@ class SimpleEntryView extends WatchUi.View {
     function acceptSelection() {
         if (_game.isGameComplete()) {
             if (_onComplete != null) {
-                _onComplete.invoke();
+                _saveFailed = _onComplete.invoke() == false;
+                if (_saveFailed) {
+                    WatchUi.requestUpdate();
+                }
             }
             return;
         }
@@ -35,12 +51,21 @@ class SimpleEntryView extends WatchUi.View {
 
     function undoLastThrow() {
         if (_game.undoLastThrow()) {
+            _saveFailed = false;
             clampSelection();
             WatchUi.requestUpdate();
             return true;
         }
 
         return false;
+    }
+
+    function hasSaveFailed() {
+        return _saveFailed;
+    }
+
+    function requestDiscard() {
+        _discardRequested = true;
     }
 
     function resetSelectionToMax() {
@@ -132,12 +157,25 @@ class SimpleEntryView extends WatchUi.View {
 
     private function drawPinSelector(dc, width, height, layout) {
         var y = (height / 2) + layout.selectorYOffset;
-        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, y, layout.selectorLabelFont, "Pins Down", Graphics.TEXT_JUSTIFY_CENTER);
+        var label = "Pins Down";
+        if (_saveFailed) {
+            label = "Save failed";
+            dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
+        } else {
+            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+        }
+        dc.drawText(width / 2, y, layout.selectorLabelFont, label, Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         if (_game.isGameComplete()) {
-            dc.drawText(width / 2, y + layout.selectorValueOffset, layout.finishFont, "Select to finish", Graphics.TEXT_JUSTIFY_CENTER);
+            var promptY = y + layout.selectorValueOffset;
+            var prompt = _saveFailed ? "Select: Retry" : "Select to finish";
+            dc.drawText(width / 2, promptY, layout.finishFont, prompt, Graphics.TEXT_JUSTIFY_CENTER);
+
+            if (_saveFailed) {
+                var discardY = promptY + dc.getFontHeight(layout.finishFont);
+                dc.drawText(width / 2, discardY, layout.selectorLabelFont, "Back: Discard", Graphics.TEXT_JUSTIFY_CENTER);
+            }
         } else {
             dc.drawText(width / 2, y + layout.selectorValueOffset, layout.selectorValueFont, _selectedPins.toString(), Graphics.TEXT_JUSTIFY_CENTER);
         }
@@ -260,6 +298,12 @@ class SimpleEntryDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onBack() {
+        if (_view != null && _view.hasSaveFailed()) {
+            var confirmation = new WatchUi.Confirmation("Discard unsaved game?");
+            WatchUi.pushView(confirmation, new BowlingDiscardUnsavedGameConfirmationDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
+            return true;
+        }
+
         if (_view != null && _view.undoLastThrow()) {
             return true;
         }

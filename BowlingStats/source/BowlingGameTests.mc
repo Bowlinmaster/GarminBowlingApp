@@ -177,3 +177,14 @@ function testSavedGameStoreClearsGames(logger) {
 
     return savedCount == 1 && BowlingSavedGameStore.getSavedGameCount() == 0;
 }
+
+(:test)
+function testSavedGameStoreRejectsIncompleteGame(logger) {
+    BowlingSavedGameStore.clearSavedGames();
+
+    var game = new BowlingGame();
+    game.recordThrow(10);
+
+    return !BowlingSavedGameStore.saveGameAt(game, 1770000400) &&
+           BowlingSavedGameStore.getSavedGameCount() == 0;
+}

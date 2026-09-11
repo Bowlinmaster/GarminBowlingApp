@@ -21,10 +21,10 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
             var theDelegate;
             if(app.usePinEntryMode){
                 // Pin-entry mode is persisted now, but still falls back until the pin-deck view exists.
-                view = new SimpleEntryView(game, method(:onGameComplete));
+                view = new SimpleEntryView(game, method(:onGameComplete), method(:onDiscardUnsavedGame));
                 theDelegate = new SimpleEntryDelegate(game, method(:onGameComplete));
             } else {
-                view = new SimpleEntryView(game, method(:onGameComplete));
+                view = new SimpleEntryView(game, method(:onGameComplete), method(:onDiscardUnsavedGame));
                 theDelegate = new SimpleEntryDelegate(game, method(:onGameComplete));
             }
 
@@ -44,12 +44,18 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
         System.exit();
     }
 
-    public function onGameComplete() as Void {
-        if (_activeGame != null) {
-            BowlingSavedGameStore.saveGame(_activeGame);
-            _activeGame = null;
+    public function onGameComplete() {
+        if (_activeGame == null || !BowlingSavedGameStore.saveGame(_activeGame)) {
+            return false;
         }
 
+        _activeGame = null;
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
+    }
+
+    public function onDiscardUnsavedGame() as Void {
+        _activeGame = null;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 }

@@ -27,23 +27,23 @@ class BowlingSavedGameStore {
             return false;
         }
 
-        var existing = getStoredValues();
-        var existingCount = getStoredCount(existing);
-        var recordsToKeep = existingCount;
-        if (recordsToKeep >= BOWLING_SAVED_GAMES_MAX_COUNT) {
-            recordsToKeep = BOWLING_SAVED_GAMES_MAX_COUNT - 1;
-        }
-
-        var updated = [];
-        updated.add(BOWLING_SAVED_GAMES_FORMAT_VERSION);
-        updated.add(recordsToKeep + 1);
-        updated.addAll(buildRecord(game, savedAtSeconds));
-
-        if (recordsToKeep > 0) {
-            updated.addAll(existing.slice(BOWLING_SAVED_GAMES_HEADER_SIZE, BOWLING_SAVED_GAMES_HEADER_SIZE + (recordsToKeep * BOWLING_SAVED_GAME_RECORD_SIZE)));
-        }
-
         try {
+            var existing = getStoredValues();
+            var existingCount = getStoredCount(existing);
+            var recordsToKeep = existingCount;
+            if (recordsToKeep >= BOWLING_SAVED_GAMES_MAX_COUNT) {
+                recordsToKeep = BOWLING_SAVED_GAMES_MAX_COUNT - 1;
+            }
+
+            var updated = [];
+            updated.add(BOWLING_SAVED_GAMES_FORMAT_VERSION);
+            updated.add(recordsToKeep + 1);
+            updated.addAll(buildRecord(game, savedAtSeconds));
+
+            if (recordsToKeep > 0) {
+                updated.addAll(existing.slice(BOWLING_SAVED_GAMES_HEADER_SIZE, BOWLING_SAVED_GAMES_HEADER_SIZE + (recordsToKeep * BOWLING_SAVED_GAME_RECORD_SIZE)));
+            }
+
             Application.Storage.setValue(BOWLING_SAVED_GAMES_STORAGE_KEY, updated);
         } catch (ex) {
             return false;
