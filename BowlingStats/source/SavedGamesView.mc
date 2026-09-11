@@ -4,34 +4,38 @@ import Toybox.Time.Gregorian;
 import Toybox.WatchUi;
 
 class SavedGamesView extends WatchUi.View {
-    var _games;
+    var _gameCount;
     var _selectedIndex;
+    var _selectedGame;
 
     function initialize() {
         WatchUi.View.initialize();
-        _games = BowlingSavedGameStore.getSavedGames();
+        _gameCount = BowlingSavedGameStore.getSavedGameCount();
         _selectedIndex = 0;
+        loadSelectedGame();
     }
 
     function nextGame() {
-        if (_games.size() <= 1) {
+        if (_gameCount <= 1) {
             return;
         }
 
-        _selectedIndex = (_selectedIndex + 1) % _games.size();
+        _selectedIndex = (_selectedIndex + 1) % _gameCount;
+        loadSelectedGame();
         WatchUi.requestUpdate();
     }
 
     function previousGame() {
-        if (_games.size() <= 1) {
+        if (_gameCount <= 1) {
             return;
         }
 
         _selectedIndex -= 1;
         if (_selectedIndex < 0) {
-            _selectedIndex = _games.size() - 1;
+            _selectedIndex = _gameCount - 1;
         }
 
+        loadSelectedGame();
         WatchUi.requestUpdate();
     }
 
@@ -43,13 +47,13 @@ class SavedGamesView extends WatchUi.View {
         var height = dc.getHeight();
         var centerX = width / 2;
 
-        if (_games.size() == 0) {
+        if (_selectedGame == null) {
             drawEmptyState(dc, centerX, height / 2);
             return;
         }
 
-        var savedGame = _games[_selectedIndex];
-        var game = buildGame(savedGame[BOWLING_SAVED_GAME_PIN_COUNTS]);
+        var savedGame = _selectedGame;
+        var game = savedGame[BOWLING_SAVED_GAME_MODEL];
 
         drawHeader(dc, savedGame, centerX, height);
         drawScorecard(dc, game, width, height);
@@ -124,22 +128,26 @@ class SavedGamesView extends WatchUi.View {
     }
 
     private function drawPosition(dc, centerX, height) {
-        if (_games.size() <= 1) {
+        if (_gameCount <= 1) {
             return;
         }
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
         var y = height - (height < 260 ? 20 : 28);
-        drawCenteredText(dc, centerX, y, Graphics.FONT_XTINY, (_selectedIndex + 1).toString() + "/" + _games.size().toString());
+        drawCenteredText(dc, centerX, y, Graphics.FONT_XTINY, (_selectedIndex + 1).toString() + "/" + _gameCount.toString());
     }
 
-    private function buildGame(pins) {
-        var game = new BowlingGame();
-        for (var i = 0; i < pins.size(); i++) {
-            game.recordThrow(pins[i]);
-        }
+    private function loadSelectedGame() {
+        _selectedGame = BowlingSavedGameStore.getSavedGame(_selectedIndex);
+        _gameCount = BowlingSavedGameStore.getSavedGameCount();
 
-        return game;
+        if (_gameCount == 0) {
+            _selectedIndex = 0;
+            _selectedGame = null;
+        } else if (_selectedIndex >= _gameCount) {
+            _selectedIndex = _gameCount - 1;
+            _selectedGame = BowlingSavedGameStore.getSavedGame(_selectedIndex);
+        }
     }
 
     private function getFrameRollText(frame, frameIndex) {

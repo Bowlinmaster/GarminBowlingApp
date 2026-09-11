@@ -14,6 +14,7 @@ const BOWLING_SAVED_GAME_SAVED_AT = "t";
 const BOWLING_SAVED_GAME_SCORE = "s";
 const BOWLING_SAVED_GAME_ROLL_COUNT = "n";
 const BOWLING_SAVED_GAME_PIN_COUNTS = "p";
+const BOWLING_SAVED_GAME_MODEL = "g";
 
 class BowlingSavedGameStore {
     // Store layout: [version, count], then newest-first fixed records.
@@ -23,7 +24,7 @@ class BowlingSavedGameStore {
     }
 
     static function saveGameAt(game, savedAtSeconds) {
-        if (game == null || !game.isGameComplete()) {
+        if (game == null || !game.isGameComplete() || !isValidTimestamp(savedAtSeconds)) {
             return false;
         }
 
@@ -52,16 +53,34 @@ class BowlingSavedGameStore {
         return true;
     }
 
-    static function getSavedGames() {
-        var games = [];
-        var values = getStoredValues();
-        var count = getStoredCount(values);
-
-        for (var i = 0; i < count; i++) {
-            games.add(decodeRecord(values, BOWLING_SAVED_GAMES_HEADER_SIZE + (i * BOWLING_SAVED_GAME_RECORD_SIZE)));
+    static function getSavedGame(index) {
+        if (!(index instanceof Number) || index < 0) {
+            return null;
         }
 
-        return games;
+        var values = getStoredValues();
+        var count = getStoredCount(values);
+        if (index >= count) {
+            return null;
+        }
+
+        // Corruption is exceptional. Remove only records encountered while resolving
+        // the requested index, leaving normal reads proportional to one game.
+        while (index < count) {
+            var game = decodeRecord(values, BOWLING_SAVED_GAMES_HEADER_SIZE + (index * BOWLING_SAVED_GAME_RECORD_SIZE));
+            if (game != null) {
+                return game;
+            }
+
+            if (!removeStoredRecord(values, index, count)) {
+                return null;
+            }
+
+            values = getStoredValues();
+            count = getStoredCount(values);
+        }
+
+        return null;
     }
 
     static function getSavedGameCount() {
@@ -88,22 +107,50 @@ class BowlingSavedGameStore {
     }
 
     static function decodeRecord(values, offset) {
-        var rollCount = values[offset + 2];
-        return {
-            BOWLING_SAVED_GAME_SAVED_AT => values[offset],
-            BOWLING_SAVED_GAME_SCORE => values[offset + 1],
-            BOWLING_SAVED_GAME_ROLL_COUNT => rollCount,
-            BOWLING_SAVED_GAME_PIN_COUNTS => unpackPins(values, offset + 3, rollCount)
-        };
+        try {
+            if (!(values instanceof Lang.Array) || !(offset instanceof Number) || offset < 0 || offset + BOWLING_SAVED_GAME_RECORD_SIZE > values.size()) {
+                return null;
+            }
+
+            var savedAt = values[offset];
+            var score = values[offset + 1];
+            var rollCount = values[offset + 2];
+            if (!isValidTimestamp(savedAt) || !(score instanceof Number) || score < 0 || score > 300 ||
+                !(rollCount instanceof Number) || rollCount < 11 || rollCount > 21 ||
+                !hasValidPackedPinGroups(values, offset + 3, rollCount)) {
+                return null;
+            }
+
+            var pins = unpackPins(values, offset + 3, rollCount);
+            var game = buildValidatedGame(pins, score);
+            if (game == null) {
+                return null;
+            }
+
+            return {
+                BOWLING_SAVED_GAME_SAVED_AT => savedAt,
+                BOWLING_SAVED_GAME_SCORE => score,
+                BOWLING_SAVED_GAME_ROLL_COUNT => rollCount,
+                BOWLING_SAVED_GAME_PIN_COUNTS => pins,
+                BOWLING_SAVED_GAME_MODEL => game
+            };
+        } catch (ex) {
+            return null;
+        }
     }
 
     private static function getStoredValues() {
-        var values = Application.Storage.getValue(BOWLING_SAVED_GAMES_STORAGE_KEY);
-        if (!(values instanceof Lang.Array) || values.size() < BOWLING_SAVED_GAMES_HEADER_SIZE || values[0] != BOWLING_SAVED_GAMES_FORMAT_VERSION) {
+        try {
+            var values = Application.Storage.getValue(BOWLING_SAVED_GAMES_STORAGE_KEY);
+            if (!(values instanceof Lang.Array) || values.size() < BOWLING_SAVED_GAMES_HEADER_SIZE ||
+                !(values[0] instanceof Number) || values[0] != BOWLING_SAVED_GAMES_FORMAT_VERSION) {
+                return emptyStore();
+            }
+
+            return values;
+        } catch (ex) {
             return emptyStore();
         }
-
-        return values;
     }
 
     private static function emptyStore() {
@@ -112,6 +159,10 @@ class BowlingSavedGameStore {
 
     private static function getStoredCount(values) {
         var count = values[1];
+        if (!(count instanceof Number) || count < 0) {
+            return 0;
+        }
+
         var availableRecords = (values.size() - BOWLING_SAVED_GAMES_HEADER_SIZE) / BOWLING_SAVED_GAME_RECORD_SIZE;
         if (count > availableRecords) {
             return availableRecords;
@@ -122,6 +173,66 @@ class BowlingSavedGameStore {
         }
 
         return count;
+    }
+
+    private static function removeStoredRecord(values, index, count) {
+        try {
+            var offset = BOWLING_SAVED_GAMES_HEADER_SIZE + (index * BOWLING_SAVED_GAME_RECORD_SIZE);
+            var end = BOWLING_SAVED_GAMES_HEADER_SIZE + (count * BOWLING_SAVED_GAME_RECORD_SIZE);
+            var updated = [BOWLING_SAVED_GAMES_FORMAT_VERSION, count - 1];
+
+            if (offset > BOWLING_SAVED_GAMES_HEADER_SIZE) {
+                updated.addAll(values.slice(BOWLING_SAVED_GAMES_HEADER_SIZE, offset));
+            }
+
+            if (offset + BOWLING_SAVED_GAME_RECORD_SIZE < end) {
+                updated.addAll(values.slice(offset + BOWLING_SAVED_GAME_RECORD_SIZE, end));
+            }
+
+            Application.Storage.setValue(BOWLING_SAVED_GAMES_STORAGE_KEY, updated);
+            return true;
+        } catch (ex) {
+            return false;
+        }
+    }
+
+    private static function isValidTimestamp(savedAtSeconds) {
+        return savedAtSeconds instanceof Number && savedAtSeconds > 0;
+    }
+
+    private static function hasValidPackedPinGroups(values, offset, rollCount) {
+        for (var group = 0; group < BOWLING_SAVED_GAME_PIN_GROUP_COUNT; group++) {
+            var packed = values[offset + group];
+            if (!(packed instanceof Number) || packed < 0 || packed > 0x0fffffff) {
+                return false;
+            }
+        }
+
+        // Unused nibbles are always zero in this format.
+        for (var i = rollCount; i < BOWLING_SAVED_GAME_PIN_GROUP_SIZE * BOWLING_SAVED_GAME_PIN_GROUP_COUNT; i++) {
+            var packedGroup = values[offset + (i / BOWLING_SAVED_GAME_PIN_GROUP_SIZE)];
+            var shift = (i % BOWLING_SAVED_GAME_PIN_GROUP_SIZE) * 4;
+            if (((packedGroup >> shift) & 0x0f) != 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static function buildValidatedGame(pins, expectedScore) {
+        var game = new BowlingGame();
+        for (var i = 0; i < pins.size(); i++) {
+            if (pins[i] > 10 || !game.recordThrow(pins[i])) {
+                return null;
+            }
+        }
+
+        if (!game.isGameComplete() || game.getScore() != expectedScore) {
+            return null;
+        }
+
+        return game;
     }
 
     private static function packPinGroup(game, rollCount, startRollIndex) {
