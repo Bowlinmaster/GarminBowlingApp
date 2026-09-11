@@ -188,3 +188,13 @@ function testSavedGameStoreRejectsIncompleteGame(logger) {
     return !BowlingSavedGameStore.saveGameAt(game, 1770000400) &&
            BowlingSavedGameStore.getSavedGameCount() == 0;
 }
+
+(:test)
+function testUnavailablePinEntryModeFallsBackToSimple(logger) {
+    var app = $.getApp();
+    app.setUsePinEntryMode(true);
+    var usesPinEntry = app.usePinEntryMode;
+    app.setUsePinEntryMode(false);
+
+    return !usesPinEntry && app.getEntryModeLabel().equals("Simple");
+}

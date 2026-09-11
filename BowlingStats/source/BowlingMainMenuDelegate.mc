@@ -13,20 +13,10 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
         var id = item.getId() as String;
 
         if(id.equals("newgame")) {
-            var app = $.getApp();
-
             var game = new Game();
             _activeGame = game;
-            var view;
-            var theDelegate;
-            if(app.usePinEntryMode){
-                // Pin-entry mode is persisted now, but still falls back until the pin-deck view exists.
-                view = new SimpleEntryView(game, method(:onGameComplete), method(:onDiscardUnsavedGame));
-                theDelegate = new SimpleEntryDelegate(game, method(:onGameComplete));
-            } else {
-                view = new SimpleEntryView(game, method(:onGameComplete), method(:onDiscardUnsavedGame));
-                theDelegate = new SimpleEntryDelegate(game, method(:onGameComplete));
-            }
+            var view = new SimpleEntryView(game, method(:onGameComplete), method(:onDiscardUnsavedGame));
+            var theDelegate = new SimpleEntryDelegate(game, method(:onGameComplete));
 
             theDelegate.setView(view);
             WatchUi.pushView(view, theDelegate, WatchUi.SLIDE_IMMEDIATE);

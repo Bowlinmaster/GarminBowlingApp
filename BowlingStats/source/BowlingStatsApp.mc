@@ -6,6 +6,7 @@ class BowlingStatsApp extends Application.AppBase {
     const ENTRY_MODE_STORAGE_KEY = "entryMode";
     const ENTRY_MODE_SIMPLE = "simple";
     const ENTRY_MODE_PIN = "pin";
+    const PIN_ENTRY_AVAILABLE = false;
 
     var usePinEntryMode = false;
 
@@ -36,7 +37,9 @@ class BowlingStatsApp extends Application.AppBase {
 
     function buildSettingsMenu() as WatchUi.Menu2 {
         var menu = new WatchUi.Menu2({ :title => "Settings" });
-        menu.addItem(new WatchUi.MenuItem("Entry Mode: " + getEntryModeLabel(), null, "togglemode", null));
+        if (PIN_ENTRY_AVAILABLE) {
+            menu.addItem(new WatchUi.MenuItem("Entry Mode: " + getEntryModeLabel(), null, "togglemode", null));
+        }
         menu.addItem(new WatchUi.MenuItem("Clear Saved Games", null, "cleargames", null));
 
         return menu;
@@ -51,13 +54,13 @@ class BowlingStatsApp extends Application.AppBase {
     }
 
     function setUsePinEntryMode(value) {
-        usePinEntryMode = value;
+        usePinEntryMode = PIN_ENTRY_AVAILABLE && value;
         Application.Storage.setValue(ENTRY_MODE_STORAGE_KEY, usePinEntryMode ? ENTRY_MODE_PIN : ENTRY_MODE_SIMPLE);
     }
 
     private function loadSettings() {
         var entryMode = Application.Storage.getValue(ENTRY_MODE_STORAGE_KEY);
-        usePinEntryMode = entryMode == ENTRY_MODE_PIN;
+        usePinEntryMode = PIN_ENTRY_AVAILABLE && entryMode == ENTRY_MODE_PIN;
     }
 
 }
