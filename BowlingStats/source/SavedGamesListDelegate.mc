@@ -1,6 +1,6 @@
 import Toybox.WatchUi;
 
-class SavedGamesDelegate extends WatchUi.BehaviorDelegate {
+class SavedGamesListDelegate extends WatchUi.BehaviorDelegate {
     var _view;
 
     function initialize(view) {
@@ -15,6 +15,11 @@ class SavedGamesDelegate extends WatchUi.BehaviorDelegate {
 
     function onPreviousPage() {
         _view.previousGame();
+        return true;
+    }
+
+    function onSelect() {
+        _view.openSelectedGame();
         return true;
     }
 

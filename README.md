@@ -9,4 +9,6 @@ This is my quest to work on a simple application that you can use to keep track 
 
 The app uses explicit device profiles so layouts can be tuned for individual Garmin products. See [BowlingStats/SUPPORTED_DEVICES.md](BowlingStats/SUPPORTED_DEVICES.md) for the support policy, current compatibility matrix, validation checklist, and requirements for adding a device.
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the device-support workflow and local compatibility checks. Project status is tracked in [ROADMAP.md](ROADMAP.md).
+
 As a fun experiment, I am generating the majority of this app with AI generated code using ChatGPT/Copilot.  You're likely not going to find good software design principals in this application.  You can blame AI for that.

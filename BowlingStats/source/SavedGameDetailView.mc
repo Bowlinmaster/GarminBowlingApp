@@ -3,40 +3,16 @@ import Toybox.Time;
 import Toybox.Time.Gregorian;
 import Toybox.WatchUi;
 
-class SavedGamesView extends WatchUi.View {
+class SavedGameDetailView extends WatchUi.View {
     var _gameCount;
     var _selectedIndex;
     var _selectedGame;
 
-    function initialize() {
+    function initialize(selectedIndex) {
         WatchUi.View.initialize();
         _gameCount = BowlingSavedGameStore.getSavedGameCount();
-        _selectedIndex = 0;
+        _selectedIndex = selectedIndex;
         loadSelectedGame();
-    }
-
-    function nextGame() {
-        if (_gameCount <= 1) {
-            return;
-        }
-
-        _selectedIndex = (_selectedIndex + 1) % _gameCount;
-        loadSelectedGame();
-        WatchUi.requestUpdate();
-    }
-
-    function previousGame() {
-        if (_gameCount <= 1) {
-            return;
-        }
-
-        _selectedIndex -= 1;
-        if (_selectedIndex < 0) {
-            _selectedIndex = _gameCount - 1;
-        }
-
-        loadSelectedGame();
-        WatchUi.requestUpdate();
     }
 
     function onUpdate(dc) {

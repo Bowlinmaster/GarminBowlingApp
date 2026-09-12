@@ -158,12 +158,28 @@ class BowlingEntryLayoutProfiles {
             return fr965();
         }
 
+        if (matchesPart(partNumber, ["006-B4570-00"])) {
+            return fr57047mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4565-00"])) {
+            return fr970();
+        }
+
         if (matchesPart(partNumber, ["006-B4260-00"])) {
             return venu3();
         }
 
+        if (matchesPart(partNumber, ["006-B4643-00", "006-B4944-00"])) {
+            return venu445mm();
+        }
+
         if (matchesPart(partNumber, ["006-B4426-00"])) {
             return vivoactive5();
+        }
+
+        if (matchesPart(partNumber, ["006-B4625-00"])) {
+            return vivoactive6();
         }
 
         if (matchesPart(partNumber, ["006-B4432-00"])) {
@@ -176,6 +192,14 @@ class BowlingEntryLayoutProfiles {
 
         if (matchesPart(partNumber, ["006-B4261-00"])) {
             return venu3s();
+        }
+
+        if (matchesPart(partNumber, ["006-B4574-00"])) {
+            return fr57042mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4644-00"])) {
+            return venu441mm();
         }
 
         if (matchesPart(partNumber, ["006-B4258-00"])) {
@@ -333,12 +357,28 @@ class BowlingEntryLayoutProfiles {
         return profile454("fr965");
     }
 
+    static function fr57047mm() {
+        return profile454("fr57047mm");
+    }
+
+    static function fr970() {
+        return profile454("fr970");
+    }
+
     static function venu3() {
         return profile454("venu3");
     }
 
+    static function venu445mm() {
+        return profile454("venu445mm");
+    }
+
     static function vivoactive5() {
         return profile390("vivoactive5");
+    }
+
+    static function vivoactive6() {
+        return profile390("vivoactive6");
     }
 
     static function fr165() {
@@ -351,6 +391,14 @@ class BowlingEntryLayoutProfiles {
 
     static function venu3s() {
         return profile390("venu3s");
+    }
+
+    static function fr57042mm() {
+        return profile390("fr57042mm");
+    }
+
+    static function venu441mm() {
+        return profile390("venu441mm");
     }
 
     static function fr265s() {

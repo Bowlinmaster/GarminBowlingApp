@@ -1,0 +1,64 @@
+name: Device support request
+description: Request support or report a layout problem for a Garmin device.
+title: "Device support: "
+labels:
+  - device-support
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping improve BowlingStats device support. Please provide the details below.
+  - type: input
+    id: model
+    attributes:
+      label: Garmin model and size
+      placeholder: Forerunner 570 42 mm
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Watch software version
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: BowlingStats version
+    validations:
+      required: true
+  - type: dropdown
+    id: input
+    attributes:
+      label: Input method affected
+      options:
+        - Buttons
+        - Touchscreen
+        - Both buttons and touchscreen
+        - Not applicable
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe clipping, overlap, incorrect controls, crashes, or other behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: Include the screen, frame, throw, and input sequence.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or photos
+      description: Attach simulator screenshots or clear photos of the watch when possible.
+  - type: checkboxes
+    id: physical-device
+    attributes:
+      label: Testing availability
+      options:
+        - label: I can test proposed changes on this physical watch.

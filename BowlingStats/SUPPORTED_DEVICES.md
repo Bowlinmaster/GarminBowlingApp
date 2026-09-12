@@ -29,8 +29,8 @@ An unknown product may receive a screen-size fallback profile. A fallback render
 ## Current Build Baseline
 
 - SDK: Connect IQ 9.1.0
-- Checked: 2026-09-11
-- Result: full release package passed all 45 SDK-expanded builds for the 31 manifest product IDs
+- Checked: 2026-09-12
+- Result: full release package passed all 52 SDK-expanded builds for the 37 manifest product IDs
 - Visual baseline: `fenix7x`
 
 ## Compatibility Matrix
@@ -60,16 +60,22 @@ Every row below passed the current release package build. `Pending` means that s
 | `fr255sm` | Forerunner 255S Music | `006-B3991-00` | 218x218 round | MIP | Buttons | `fr255sMusic()` | Build verified; visual pending |
 | `fr265` | Forerunner 265 | `006-B4257-00` | 416x416 round | AMOLED | Touch + buttons | `fr265()` | Build verified; visual pending |
 | `fr265s` | Forerunner 265S | `006-B4258-00` | 360x360 round | AMOLED | Touch + buttons | `fr265s()` | Build verified; visual pending |
+| `fr57042mm` | Forerunner 570 42mm | `006-B4574-00` | 390x390 round | AMOLED | Touch + buttons | `fr57042mm()` | Build verified; visual pending |
+| `fr57047mm` | Forerunner 570 47mm | `006-B4570-00` | 454x454 round | AMOLED | Touch + buttons | `fr57047mm()` | Build verified; visual pending |
 | `fr955` | Forerunner 955 / Solar | `006-B4024-00` | 260x260 round | MIP | Touch + buttons | `fr955()` | Build verified; visual pending |
 | `fr965` | Forerunner 965 | `006-B4315-00` | 454x454 round | AMOLED | Touch + buttons | `fr965()` | Build verified; visual pending |
+| `fr970` | Forerunner 970 | `006-B4565-00` | 454x454 round | AMOLED | Touch + buttons | `fr970()` | Build verified; visual pending |
 | `venu2` | Venu 2 | `006-B3703-00`, `006-B3950-00`, `006-B4171-00`, `006-B4180-00` | 416x416 round | AMOLED | Touch + buttons | `venu2()` | Build verified; visual pending |
 | `venu2plus` | Venu 2 Plus | `006-B3851-00`, `006-B4017-00` | 416x416 round | AMOLED | Touch + buttons | `venu2Plus()` | Build verified; visual pending |
 | `venu2s` | Venu 2S | `006-B3704-00`, `006-B3949-00`, `006-B4175-00`, `006-B4181-00` | 360x360 round | AMOLED | Touch + buttons | `venu2s()` | Build verified; visual pending |
 | `venu3` | Venu 3 | `006-B4260-00` | 454x454 round | AMOLED | Touch + buttons | `venu3()` | Build verified; visual pending |
 | `venu3s` | Venu 3S | `006-B4261-00` | 390x390 round | AMOLED | Touch + buttons | `venu3s()` | Build verified; visual pending |
+| `venu441mm` | Venu 4 41mm | `006-B4644-00` | 390x390 round | AMOLED | Touch + buttons | `venu441mm()` | Build verified; visual pending |
+| `venu445mm` | Venu 4 45mm / D2 Air X15 | `006-B4643-00`, `006-B4944-00` | 454x454 round | AMOLED | Touch + buttons | `venu445mm()` | Build verified; visual pending |
 | `venusq2` | Venu Sq 2 | `006-B4115-00` | 320x360 rectangular | AMOLED | Touch + buttons | `venuSq2()` | Build verified; visual pending |
 | `venusq2m` | Venu Sq 2 Music | `006-B4116-00` | 320x360 rectangular | AMOLED | Touch + buttons | `venuSq2Music()` | Build verified; visual pending |
 | `vivoactive5` | vivoactive 5 | `006-B4426-00` | 390x390 round | AMOLED | Touch + buttons | `vivoactive5()` | Build verified; visual pending |
+| `vivoactive6` | vivoactive 6 | `006-B4625-00` | 390x390 round | AMOLED | Touch + buttons | `vivoactive6()` | Build verified; visual pending |
 
 ## Representative Visual Matrix
 

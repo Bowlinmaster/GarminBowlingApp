@@ -83,6 +83,34 @@ class BowlingSavedGameStore {
         return null;
     }
 
+    static function getSavedGameSummary(index) {
+        if (!(index instanceof Number) || index < 0) {
+            return null;
+        }
+
+        var values = getStoredValues();
+        var count = getStoredCount(values);
+        if (index >= count) {
+            return null;
+        }
+
+        while (index < count) {
+            var summary = decodeSummary(values, BOWLING_SAVED_GAMES_HEADER_SIZE + (index * BOWLING_SAVED_GAME_RECORD_SIZE));
+            if (summary != null) {
+                return summary;
+            }
+
+            if (!removeStoredRecord(values, index, count)) {
+                return null;
+            }
+
+            values = getStoredValues();
+            count = getStoredCount(values);
+        }
+
+        return null;
+    }
+
     static function getSavedGameCount() {
         return getStoredCount(getStoredValues());
     }
@@ -133,6 +161,30 @@ class BowlingSavedGameStore {
                 BOWLING_SAVED_GAME_ROLL_COUNT => rollCount,
                 BOWLING_SAVED_GAME_PIN_COUNTS => pins,
                 BOWLING_SAVED_GAME_MODEL => game
+            };
+        } catch (ex) {
+            return null;
+        }
+    }
+
+    private static function decodeSummary(values, offset) {
+        try {
+            if (!(values instanceof Lang.Array) || !(offset instanceof Number) || offset < 0 || offset + BOWLING_SAVED_GAME_RECORD_SIZE > values.size()) {
+                return null;
+            }
+
+            var savedAt = values[offset];
+            var score = values[offset + 1];
+            var rollCount = values[offset + 2];
+            if (!isValidTimestamp(savedAt) || !(score instanceof Number) || score < 0 || score > 300 ||
+                !(rollCount instanceof Number) || rollCount < 11 || rollCount > 21 ||
+                !hasValidPackedPinGroups(values, offset + 3, rollCount)) {
+                return null;
+            }
+
+            return {
+                BOWLING_SAVED_GAME_SAVED_AT => savedAt,
+                BOWLING_SAVED_GAME_SCORE => score
             };
         } catch (ex) {
             return null;
