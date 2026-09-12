@@ -19,11 +19,11 @@ const BOWLING_SAVED_GAME_MODEL = "g";
 class BowlingSavedGameStore {
     // Store layout: [version, count], then newest-first fixed records.
     // Each record is savedAt, score, rollCount, and three packed pin-count fields.
-    static function saveGame(game) {
+    static function saveGame(game as BowlingGame) as Boolean {
         return saveGameAt(game, Time.now().value());
     }
 
-    static function saveGameAt(game, savedAtSeconds) {
+    static function saveGameAt(game as BowlingGame, savedAtSeconds as Number) as Boolean {
         if (game == null || !game.isGameComplete() || !isValidTimestamp(savedAtSeconds)) {
             return false;
         }
@@ -53,7 +53,7 @@ class BowlingSavedGameStore {
         return true;
     }
 
-    static function getSavedGame(index) {
+    static function getSavedGame(index as Number) as Lang.Dictionary or Null {
         if (!(index instanceof Number) || index < 0) {
             return null;
         }
@@ -83,7 +83,7 @@ class BowlingSavedGameStore {
         return null;
     }
 
-    static function getSavedGameSummary(index) {
+    static function getSavedGameSummary(index as Number) as Lang.Dictionary or Null {
         if (!(index instanceof Number) || index < 0) {
             return null;
         }
@@ -111,16 +111,16 @@ class BowlingSavedGameStore {
         return null;
     }
 
-    static function getSavedGameCount() {
+    static function getSavedGameCount() as Number {
         return getStoredCount(getStoredValues());
     }
 
-    static function clearSavedGames() {
+    static function clearSavedGames() as Void {
         Application.Storage.deleteValue(BOWLING_SAVED_GAMES_STORAGE_KEY);
     }
 
-    static function buildRecord(game, savedAtSeconds) {
-        var record = [];
+    static function buildRecord(game as BowlingGame, savedAtSeconds as Number) as Lang.Array {
+        var record = [] as Lang.Array;
         var rollCount = game.getRecordedRollCount();
 
         record.add(savedAtSeconds);
@@ -134,7 +134,7 @@ class BowlingSavedGameStore {
         return record;
     }
 
-    static function decodeRecord(values, offset) {
+    static function decodeRecord(values as Lang.Array, offset as Number) as Lang.Dictionary or Null {
         try {
             if (!(values instanceof Lang.Array) || !(offset instanceof Number) || offset < 0 || offset + BOWLING_SAVED_GAME_RECORD_SIZE > values.size()) {
                 return null;
@@ -167,7 +167,7 @@ class BowlingSavedGameStore {
         }
     }
 
-    private static function decodeSummary(values, offset) {
+    private static function decodeSummary(values as Lang.Array, offset as Number) as Lang.Dictionary or Null {
         try {
             if (!(values instanceof Lang.Array) || !(offset instanceof Number) || offset < 0 || offset + BOWLING_SAVED_GAME_RECORD_SIZE > values.size()) {
                 return null;
@@ -191,7 +191,7 @@ class BowlingSavedGameStore {
         }
     }
 
-    private static function getStoredValues() {
+    private static function getStoredValues() as Lang.Array {
         try {
             var values = Application.Storage.getValue(BOWLING_SAVED_GAMES_STORAGE_KEY);
             if (!(values instanceof Lang.Array) || values.size() < BOWLING_SAVED_GAMES_HEADER_SIZE ||
@@ -205,11 +205,11 @@ class BowlingSavedGameStore {
         }
     }
 
-    private static function emptyStore() {
+    private static function emptyStore() as Lang.Array {
         return [BOWLING_SAVED_GAMES_FORMAT_VERSION, 0];
     }
 
-    private static function getStoredCount(values) {
+    private static function getStoredCount(values as Lang.Array) as Number {
         var count = values[1];
         if (!(count instanceof Number) || count < 0) {
             return 0;
@@ -227,7 +227,7 @@ class BowlingSavedGameStore {
         return count;
     }
 
-    private static function removeStoredRecord(values, index, count) {
+    private static function removeStoredRecord(values as Lang.Array, index as Number, count as Number) as Boolean {
         try {
             var offset = BOWLING_SAVED_GAMES_HEADER_SIZE + (index * BOWLING_SAVED_GAME_RECORD_SIZE);
             var end = BOWLING_SAVED_GAMES_HEADER_SIZE + (count * BOWLING_SAVED_GAME_RECORD_SIZE);
@@ -248,11 +248,11 @@ class BowlingSavedGameStore {
         }
     }
 
-    private static function isValidTimestamp(savedAtSeconds) {
+    private static function isValidTimestamp(savedAtSeconds) as Boolean {
         return savedAtSeconds instanceof Number && savedAtSeconds > 0;
     }
 
-    private static function hasValidPackedPinGroups(values, offset, rollCount) {
+    private static function hasValidPackedPinGroups(values as Lang.Array, offset as Number, rollCount as Number) as Boolean {
         for (var group = 0; group < BOWLING_SAVED_GAME_PIN_GROUP_COUNT; group++) {
             var packed = values[offset + group];
             if (!(packed instanceof Number) || packed < 0 || packed > 0x0fffffff) {
@@ -272,7 +272,7 @@ class BowlingSavedGameStore {
         return true;
     }
 
-    private static function buildValidatedGame(pins, expectedScore) {
+    private static function buildValidatedGame(pins as Array<Number>, expectedScore as Number) as BowlingGame or Null {
         var game = new BowlingGame();
         for (var i = 0; i < pins.size(); i++) {
             if (pins[i] > 10 || !game.recordThrow(pins[i])) {
@@ -287,7 +287,7 @@ class BowlingSavedGameStore {
         return game;
     }
 
-    private static function packPinGroup(game, rollCount, startRollIndex) {
+    private static function packPinGroup(game as BowlingGame, rollCount as Number, startRollIndex as Number) as Number {
         var packed = 0;
         var shift = 0;
 
@@ -301,8 +301,8 @@ class BowlingSavedGameStore {
         return packed;
     }
 
-    private static function unpackPins(values, offset, rollCount) {
-        var pins = [];
+    private static function unpackPins(values as Lang.Array, offset as Number, rollCount as Number) as Array<Number> {
+        var pins = [] as Array<Number>;
         for (var i = 0; i < rollCount; i++) {
             var packed = values[offset + (i / BOWLING_SAVED_GAME_PIN_GROUP_SIZE)];
             var shift = (i % BOWLING_SAVED_GAME_PIN_GROUP_SIZE) * 4;

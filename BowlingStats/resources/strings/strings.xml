@@ -1,3 +1,23 @@
 <strings>
     <string id="AppName">BowlingStats</string>
+    <string id="MainMenuTitle">Bowling</string>
+    <string id="StartNewGame">Start New Game</string>
+    <string id="ViewGames">View Games</string>
+    <string id="Settings">Settings</string>
+    <string id="EntryModeFormat">Entry Mode: $1$</string>
+    <string id="EntryModePin">Pin</string>
+    <string id="EntryModeSimple">Simple</string>
+    <string id="ClearSavedGames">Clear Saved Games</string>
+    <string id="ClearSavedGamesConfirmation">Clear saved games?</string>
+    <string id="SavedGamesTitle">Saved Games</string>
+    <string id="NoSavedGames">No saved games</string>
+    <string id="FinishGameFirst">Finish a game first</string>
+    <string id="ScoreFormat">Score $1$</string>
+    <string id="PinsDown">Pins Down</string>
+    <string id="SaveFailed">Save failed</string>
+    <string id="RetrySave">Select: Retry</string>
+    <string id="FinishGame">Select to finish</string>
+    <string id="DiscardSave">Back: Discard</string>
+    <string id="DiscardUnsavedGameConfirmation">Discard unsaved game?</string>
+    <string id="DiscardCurrentGameConfirmation">Discard current game?</string>
 </strings>

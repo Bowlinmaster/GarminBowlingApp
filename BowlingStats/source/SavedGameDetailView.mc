@@ -1,12 +1,13 @@
 import Toybox.Graphics;
+import Toybox.Lang;
 import Toybox.Time;
 import Toybox.Time.Gregorian;
 import Toybox.WatchUi;
 
 class SavedGameDetailView extends WatchUi.View {
-    var _gameCount;
-    var _selectedIndex;
-    var _selectedGame;
+    var _gameCount as Number;
+    var _selectedIndex as Number;
+    var _selectedGame as Lang.Dictionary or Null;
 
     function initialize(selectedIndex) {
         WatchUi.View.initialize();
@@ -28,8 +29,8 @@ class SavedGameDetailView extends WatchUi.View {
             return;
         }
 
-        var savedGame = _selectedGame;
-        var game = savedGame[BOWLING_SAVED_GAME_MODEL];
+        var savedGame = _selectedGame as Lang.Dictionary;
+        var game = savedGame[BOWLING_SAVED_GAME_MODEL] as BowlingGame;
 
         drawHeader(dc, savedGame, centerX, height);
         drawScorecard(dc, game, width, height);
@@ -38,13 +39,13 @@ class SavedGameDetailView extends WatchUi.View {
 
     private function drawEmptyState(dc, centerX, centerY) {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        drawCenteredText(dc, centerX, centerY - 12, Graphics.FONT_SMALL, "No saved games");
+        drawCenteredText(dc, centerX, centerY - 12, Graphics.FONT_SMALL, bowlingString(Rez.Strings.NoSavedGames));
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        drawCenteredText(dc, centerX, centerY + 14, Graphics.FONT_XTINY, "Finish a game first");
+        drawCenteredText(dc, centerX, centerY + 14, Graphics.FONT_XTINY, bowlingString(Rez.Strings.FinishGameFirst));
     }
 
-    private function drawHeader(dc, savedGame, centerX, height) {
+    private function drawHeader(dc, savedGame as Lang.Dictionary, centerX, height) {
         var dateY = height < 260 ? 18 : 24;
         var scoreY = height < 260 ? 42 : 52;
 
@@ -53,7 +54,8 @@ class SavedGameDetailView extends WatchUi.View {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         var score = savedGame[BOWLING_SAVED_GAME_SCORE];
-        drawCenteredText(dc, centerX, scoreY, Graphics.FONT_MEDIUM, "Score " + score.toString());
+        var scoreText = Lang.format(bowlingString(Rez.Strings.ScoreFormat), [score]);
+        drawCenteredText(dc, centerX, scoreY, Graphics.FONT_MEDIUM, scoreText);
     }
 
     private function drawScorecard(dc, game, width, height) {
@@ -131,7 +133,7 @@ class SavedGameDetailView extends WatchUi.View {
             return "X";
         }
 
-        var labels = [];
+        var labels = [] as Array<String>;
         var maxRolls = frameIndex == 9 ? 3 : 2;
         for (var rollIndex = 0; rollIndex < maxRolls; rollIndex++) {
             var label = getRollLabel(frame, rollIndex);
@@ -143,7 +145,7 @@ class SavedGameDetailView extends WatchUi.View {
         return joinLabels(labels);
     }
 
-    private function joinLabels(labels) {
+    private function joinLabels(labels as Array<String>) as String {
         var text = "";
         for (var i = 0; i < labels.size(); i++) {
             if (i > 0) {
@@ -188,8 +190,8 @@ class SavedGameDetailView extends WatchUi.View {
         return pins.toString();
     }
 
-    private function getSavedAtText(savedGame) {
-        var savedAt = savedGame[BOWLING_SAVED_GAME_SAVED_AT];
+    private function getSavedAtText(savedGame as Lang.Dictionary) {
+        var savedAt = savedGame[BOWLING_SAVED_GAME_SAVED_AT] as Number;
         var info = Gregorian.info(new Time.Moment(savedAt), Time.FORMAT_SHORT);
         var year = info.year % 100;
 

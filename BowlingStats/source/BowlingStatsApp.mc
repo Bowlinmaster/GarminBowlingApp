@@ -27,26 +27,27 @@ class BowlingStatsApp extends Application.AppBase {
     }
 
     function buildMainMenu() as WatchUi.Menu2 {
-        var menu = new WatchUi.Menu2({ :title => "Bowling" });
-        menu.addItem(new WatchUi.MenuItem("Start New Game", null, "newgame", null));
-        menu.addItem(new WatchUi.MenuItem("View Games", null, "viewgames", null));
-        menu.addItem(new WatchUi.MenuItem("Settings", null, "settings", null));
+        var menu = new WatchUi.Menu2({ :title => bowlingString(Rez.Strings.MainMenuTitle) });
+        menu.addItem(new WatchUi.MenuItem(bowlingString(Rez.Strings.StartNewGame), null, "newgame", null));
+        menu.addItem(new WatchUi.MenuItem(bowlingString(Rez.Strings.ViewGames), null, "viewgames", null));
+        menu.addItem(new WatchUi.MenuItem(bowlingString(Rez.Strings.Settings), null, "settings", null));
 
         return menu;
     }
 
     function buildSettingsMenu() as WatchUi.Menu2 {
-        var menu = new WatchUi.Menu2({ :title => "Settings" });
+        var menu = new WatchUi.Menu2({ :title => bowlingString(Rez.Strings.Settings) });
         if (PIN_ENTRY_AVAILABLE) {
-            menu.addItem(new WatchUi.MenuItem("Entry Mode: " + getEntryModeLabel(), null, "togglemode", null));
+            var entryModeLabel = Lang.format(bowlingString(Rez.Strings.EntryModeFormat), [getEntryModeLabel()]);
+            menu.addItem(new WatchUi.MenuItem(entryModeLabel, null, "togglemode", null));
         }
-        menu.addItem(new WatchUi.MenuItem("Clear Saved Games", null, "cleargames", null));
+        menu.addItem(new WatchUi.MenuItem(bowlingString(Rez.Strings.ClearSavedGames), null, "cleargames", null));
 
         return menu;
     }
 
     function getEntryModeLabel() {
-        return usePinEntryMode ? "Pin" : "Simple";
+        return usePinEntryMode ? bowlingString(Rez.Strings.EntryModePin) : bowlingString(Rez.Strings.EntryModeSimple);
     }
 
     function toggleEntryMode() {

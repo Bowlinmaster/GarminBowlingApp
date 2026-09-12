@@ -65,10 +65,10 @@ class SavedGamesListView extends WatchUi.View {
         var centerX = width / 2;
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        drawCenteredText(dc, centerX, height < 260 ? 20 : 28, Graphics.FONT_SMALL, "Saved Games");
+        drawCenteredText(dc, centerX, height < 260 ? 20 : 28, Graphics.FONT_SMALL, bowlingString(Rez.Strings.SavedGamesTitle));
 
         if (_gameCount == 0) {
-            drawCenteredText(dc, centerX, height / 2, Graphics.FONT_XTINY, "No saved games");
+            drawCenteredText(dc, centerX, height / 2, Graphics.FONT_XTINY, bowlingString(Rez.Strings.NoSavedGames));
             return;
         }
 

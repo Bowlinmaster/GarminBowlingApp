@@ -1,4 +1,5 @@
 using Toybox.Graphics;
+import Toybox.Lang;
 using Toybox.System;
 using Toybox.WatchUi;
 
@@ -9,7 +10,7 @@ class SimpleEntryView extends WatchUi.View {
     var _selectedPins;
     var _saveFailed;
     var _discardRequested;
-    var _discardTouchBounds;
+    var _discardTouchBounds as Array<Number> or Null;
 
     function initialize(game, onComplete, onDiscard) {
         WatchUi.View.initialize();
@@ -161,9 +162,9 @@ class SimpleEntryView extends WatchUi.View {
 
     private function drawPinSelector(dc, width, height, layout) {
         var y = (height / 2) + layout.selectorYOffset;
-        var label = "Pins Down";
+        var label = bowlingString(Rez.Strings.PinsDown);
         if (_saveFailed) {
-            label = "Save failed";
+            label = bowlingString(Rez.Strings.SaveFailed);
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
         } else {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
@@ -173,12 +174,12 @@ class SimpleEntryView extends WatchUi.View {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         if (_game.isGameComplete()) {
             var promptY = y + layout.selectorValueOffset;
-            var prompt = _saveFailed ? "Select: Retry" : "Select to finish";
+            var prompt = _saveFailed ? bowlingString(Rez.Strings.RetrySave) : bowlingString(Rez.Strings.FinishGame);
             dc.drawText(width / 2, promptY, layout.finishFont, prompt, Graphics.TEXT_JUSTIFY_CENTER);
 
             if (_saveFailed) {
                 var discardY = promptY + dc.getFontHeight(layout.finishFont);
-                dc.drawText(width / 2, discardY, layout.selectorLabelFont, "Back: Discard", Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(width / 2, discardY, layout.selectorLabelFont, bowlingString(Rez.Strings.DiscardSave), Graphics.TEXT_JUSTIFY_CENTER);
             }
         } else {
             dc.drawText(width / 2, y + layout.selectorValueOffset, layout.selectorValueFont, _selectedPins.toString(), Graphics.TEXT_JUSTIFY_CENTER);
@@ -225,15 +226,16 @@ class SimpleEntryView extends WatchUi.View {
         _discardTouchBounds = [x - hitRadius, y - hitRadius, x + hitRadius, y + hitRadius];
     }
 
-    function isDiscardTap(coordinates) {
+    function isDiscardTap(coordinates as Array<Number>) as Boolean {
         if (_discardTouchBounds == null) {
             return false;
         }
 
-        return coordinates[0] >= _discardTouchBounds[0]
-            && coordinates[0] <= _discardTouchBounds[2]
-            && coordinates[1] >= _discardTouchBounds[1]
-            && coordinates[1] <= _discardTouchBounds[3];
+        var bounds = _discardTouchBounds as Array<Number>;
+        return coordinates[0] >= bounds[0]
+            && coordinates[0] <= bounds[2]
+            && coordinates[1] >= bounds[1]
+            && coordinates[1] <= bounds[3];
     }
 
     private function drawCenteredText(dc, x, y, font, text) {
@@ -376,7 +378,9 @@ class SimpleEntryDelegate extends WatchUi.BehaviorDelegate {
             return;
         }
 
-        var message = _view.hasSaveFailed() ? "Discard unsaved game?" : "Discard current game?";
+        var message = _view.hasSaveFailed()
+            ? bowlingString(Rez.Strings.DiscardUnsavedGameConfirmation)
+            : bowlingString(Rez.Strings.DiscardCurrentGameConfirmation);
         var confirmation = new WatchUi.Confirmation(message);
         WatchUi.pushView(confirmation, new BowlingDiscardGameConfirmationDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
     }

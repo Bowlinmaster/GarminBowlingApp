@@ -1,11 +1,11 @@
 import Toybox.Lang;
 
 class BowlingThrow {
-    var pins;
+    var pins as Number;
     // Reserved for future per-pin entry; score calculation only needs the count.
-    var pinMask;
+    var pinMask as Number or Null;
 
-    function initialize(pinCount, knockedDownPinMask) {
+    function initialize(pinCount as Number, knockedDownPinMask as Number or Null) {
         pins = pinCount;
         pinMask = knockedDownPinMask;
     }
@@ -19,15 +19,15 @@ class BowlingThrow {
 }
 
 class BowlingFrame {
-    var rolls;
-    var frameIndex;
+    var rolls as Array<BowlingThrow>;
+    var frameIndex as Number;
 
-    function initialize(index) {
+    function initialize(index as Number) {
         frameIndex = index;
-        rolls = [];
+        rolls = [] as Array<BowlingThrow>;
     }
 
-    function addThrow(ball) {
+    function addThrow(ball as BowlingThrow) {
         rolls.add(ball);
     }
 
@@ -45,7 +45,7 @@ class BowlingFrame {
         return rolls.size();
     }
 
-    function getPinsAt(index) {
+    function getPinsAt(index as Number) as Number or Null {
         if (index < 0 || index >= rolls.size()) {
             return null;
         }
@@ -103,12 +103,12 @@ class BowlingFrame {
 }
 
 class BowlingGame {
-    var frames;
-    var currentFrame;
-    var isComplete;
+    var frames as Array<BowlingFrame>;
+    var currentFrame as Number;
+    var isComplete as Boolean;
 
     function initialize() {
-        frames = [];
+        frames = [] as Array<BowlingFrame>;
         for (var i = 0; i < 10; i++) {
             frames.add(new BowlingFrame(i));
         }
@@ -117,11 +117,11 @@ class BowlingGame {
         isComplete = false;
     }
 
-    function recordThrow(pinCount) {
+    function recordThrow(pinCount as Number) {
         return recordThrowWithPins(pinCount, null);
     }
 
-    function recordThrowWithPins(pinCount, knockedDownPinMask) {
+    function recordThrowWithPins(pinCount as Number, knockedDownPinMask as Number or Null) {
         if (isComplete || !isLegalPinCount(pinCount)) {
             return false;
         }
@@ -151,7 +151,7 @@ class BowlingGame {
     }
 
     function getLegalPinCounts() {
-        var values = [];
+        var values = [] as Array<Number>;
         var maxPins = getMaxPinsForCurrentThrow();
         if (maxPins == null) {
             return values;
@@ -227,7 +227,7 @@ class BowlingGame {
         return frames[currentFrame].getRollCount() + 1;
     }
 
-    function getFrame(index) {
+    function getFrame(index as Number) as BowlingFrame {
         return frames[index];
     }
 
@@ -240,7 +240,7 @@ class BowlingGame {
         return rollCount;
     }
 
-    function getRecordedPinsAt(rollIndex) {
+    function getRecordedPinsAt(rollIndex as Number) as Number or Null {
         var currentRoll = 0;
         for (var frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
             var frame = frames[frameIndex];
@@ -270,7 +270,7 @@ class BowlingGame {
         return score;
     }
 
-    function getFrameScore(index) {
+    function getFrameScore(index as Number) as Number or Null {
         var frame = frames[index];
         if (!frame.isComplete()) {
             return null;
@@ -301,7 +301,7 @@ class BowlingGame {
         return frame.totalPins();
     }
 
-    function getCumulativeScoreThrough(index) {
+    function getCumulativeScoreThrough(index as Number) as Number or Null {
         var score = 0;
         for (var i = 0; i <= index; i++) {
             var frameScore = getFrameScore(i);
@@ -315,7 +315,7 @@ class BowlingGame {
         return score;
     }
 
-    function getPotentialScoreForCurrentThrow(pinCount) {
+    function getPotentialScoreForCurrentThrow(pinCount as Number) as Number or Null {
         if (isComplete) {
             return getScore();
         }
@@ -356,8 +356,8 @@ class BowlingGame {
         currentFrame += 1;
     }
 
-    private function getNextRolls(frameIndex, count) {
-        var nextRolls = [];
+    private function getNextRolls(frameIndex as Number, count as Number) as Array<Number> {
+        var nextRolls = [] as Array<Number>;
         var index = frameIndex + 1;
 
         while (index < 10 && nextRolls.size() < count) {
@@ -372,7 +372,7 @@ class BowlingGame {
         return nextRolls;
     }
 
-    private function getPotentialScoreThrough(index, pendingPinCount) {
+    private function getPotentialScoreThrough(index as Number, pendingPinCount as Number) as Number or Null {
         var score = 0;
         for (var i = 0; i <= index; i++) {
             var frameScore = getPotentialFrameScore(i, pendingPinCount);
@@ -386,7 +386,7 @@ class BowlingGame {
         return score;
     }
 
-    private function getPotentialFrameScore(index, pendingPinCount) {
+    private function getPotentialFrameScore(index as Number, pendingPinCount as Number) as Number or Null {
         var first = getPotentialPinsAt(index, 0, pendingPinCount);
         if (first == null) {
             return null;
@@ -423,7 +423,7 @@ class BowlingGame {
         return first + second;
     }
 
-    private function getPotentialFrameTotal(index, pendingPinCount) {
+    private function getPotentialFrameTotal(index as Number, pendingPinCount as Number) as Number {
         var total = 0;
         var rollCount = getPotentialRollCount(index);
         for (var roll = 0; roll < rollCount; roll++) {
@@ -436,8 +436,8 @@ class BowlingGame {
         return total;
     }
 
-    private function getPotentialNextRolls(frameIndex, count, pendingPinCount) {
-        var nextRolls = [];
+    private function getPotentialNextRolls(frameIndex as Number, count as Number, pendingPinCount as Number) as Array<Number> {
+        var nextRolls = [] as Array<Number>;
         var index = frameIndex + 1;
 
         while (index < 10 && nextRolls.size() < count) {
@@ -455,7 +455,7 @@ class BowlingGame {
         return nextRolls;
     }
 
-    private function getPotentialRollCount(index) {
+    private function getPotentialRollCount(index as Number) as Number {
         var rollCount = frames[index].getRollCount();
         if (!isComplete && index == currentFrame) {
             return rollCount + 1;
@@ -464,7 +464,7 @@ class BowlingGame {
         return rollCount;
     }
 
-    private function getPotentialPinsAt(index, rollIndex, pendingPinCount) {
+    private function getPotentialPinsAt(index as Number, rollIndex as Number, pendingPinCount as Number) as Number or Null {
         var frame = frames[index];
         var pins = frame.getPinsAt(rollIndex);
         if (pins != null) {

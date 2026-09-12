@@ -1,4 +1,5 @@
 using Toybox.Graphics;
+import Toybox.Lang;
 using Toybox.System;
 
 class BowlingEntryLayoutProfile {
@@ -25,7 +26,7 @@ class BowlingEntryLayoutProfile {
     var selectorValueFont;
     var finishFont;
 
-    function initialize(options) {
+    function initialize(options as Lang.Dictionary) {
         name = options[:name];
         cardWidth = options[:cardWidth];
         headerHeight = options[:headerHeight];
@@ -236,7 +237,7 @@ class BowlingEntryLayoutProfiles {
         return fenix7x();
     }
 
-    static function matchesPart(partNumber, partNumbers) {
+    static function matchesPart(partNumber as String, partNumbers as Array<String>) {
         for (var i = 0; i < partNumbers.size(); i++) {
             if (partNumber.equals(partNumbers[i])) {
                 return true;

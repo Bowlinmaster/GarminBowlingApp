@@ -13,19 +13,19 @@
 10. Make device-support contributions straightforward.
 11. Add a GitHub device-request issue template.
 12. Automate local compatibility checks.
+14. Complete release-quality cleanup:
+   - Add Monkey C container and method type annotations.
+   - Eliminate compiler warnings in application and test builds.
+   - Provide correctly sized launcher icons for supported devices.
+   - Move visible strings into resources.
+   - Expand tenth-frame and storage edge-case tests.
+   - Validate application metadata and release packaging.
 15. Add a saved-game summary list and detail flow.
 
 ## Remaining
 
 9. Evaluate secondary device families.
 13. Establish visual regression checks.
-14. Complete release-quality cleanup:
-   - Add Monkey C container and method type annotations.
-   - Reduce compiler warnings.
-   - Fix launcher icon sizing.
-   - Move visible strings into resources.
-   - Expand tenth-frame and storage edge-case tests.
-   - Review application metadata and packaging.
 
 ## Future Features
 
