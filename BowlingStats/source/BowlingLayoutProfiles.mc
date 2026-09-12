@@ -17,6 +17,7 @@ class BowlingEntryLayoutProfile {
     var confirmIconYOffset;
     var confirmIconSize;
     var confirmIconPenWidth;
+    var discardIconBottomInset;
     var frameNumberFont;
     var rollFont;
     var scoreFont;
@@ -40,6 +41,7 @@ class BowlingEntryLayoutProfile {
         confirmIconYOffset = options[:confirmIconYOffset];
         confirmIconSize = options[:confirmIconSize];
         confirmIconPenWidth = options[:confirmIconPenWidth];
+        discardIconBottomInset = options[:discardIconBottomInset];
         frameNumberFont = options[:frameNumberFont];
         rollFont = options[:rollFont];
         scoreFont = options[:scoreFont];
@@ -237,6 +239,7 @@ class BowlingEntryLayoutProfiles {
             :confirmIconYOffset => 58,
             :confirmIconSize => 18,
             :confirmIconPenWidth => 3,
+            :discardIconBottomInset => 22,
             :frameNumberFont => Graphics.FONT_XTINY,
             :rollFont => Graphics.FONT_SMALL,
             :scoreFont => Graphics.FONT_LARGE,
@@ -410,6 +413,7 @@ class BowlingEntryLayoutProfiles {
         profile.confirmIconRightInset = 30;
         profile.confirmIconYOffset = 46;
         profile.confirmIconSize = 14;
+        profile.discardIconBottomInset = 16;
         return profile;
     }
 
@@ -427,6 +431,7 @@ class BowlingEntryLayoutProfiles {
         profile.confirmIconRightInset = 50;
         profile.confirmIconYOffset = 76;
         profile.confirmIconSize = 20;
+        profile.discardIconBottomInset = 24;
         return profile;
     }
 
@@ -440,6 +445,7 @@ class BowlingEntryLayoutProfiles {
         profile.confirmIconRightInset = 54;
         profile.confirmIconYOffset = 82;
         profile.confirmIconSize = 20;
+        profile.discardIconBottomInset = 26;
         return profile;
     }
 
@@ -453,6 +459,7 @@ class BowlingEntryLayoutProfiles {
         profile.confirmIconRightInset = 58;
         profile.confirmIconYOffset = 86;
         profile.confirmIconSize = 22;
+        profile.discardIconBottomInset = 28;
         return profile;
     }
 
@@ -476,6 +483,7 @@ class BowlingEntryLayoutProfiles {
         profile.confirmIconRightInset = 36;
         profile.confirmIconYOffset = 74;
         profile.confirmIconSize = 18;
+        profile.discardIconBottomInset = 22;
         return profile;
     }
 
@@ -496,6 +504,7 @@ class BowlingEntryLayoutProfiles {
             :confirmIconYOffset => 50,
             :confirmIconSize => 15,
             :confirmIconPenWidth => 3,
+            :discardIconBottomInset => 18,
             :frameNumberFont => Graphics.FONT_XTINY,
             :rollFont => Graphics.FONT_XTINY,
             :scoreFont => Graphics.FONT_MEDIUM,
@@ -522,6 +531,7 @@ class BowlingEntryLayoutProfiles {
             :confirmIconYOffset => 94,
             :confirmIconSize => 24,
             :confirmIconPenWidth => 4,
+            :discardIconBottomInset => 30,
             :frameNumberFont => Graphics.FONT_XTINY,
             :rollFont => Graphics.FONT_SMALL,
             :scoreFont => Graphics.FONT_LARGE,

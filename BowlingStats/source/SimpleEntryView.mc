@@ -1,4 +1,5 @@
 using Toybox.Graphics;
+using Toybox.System;
 using Toybox.WatchUi;
 
 class SimpleEntryView extends WatchUi.View {
@@ -8,6 +9,7 @@ class SimpleEntryView extends WatchUi.View {
     var _selectedPins;
     var _saveFailed;
     var _discardRequested;
+    var _discardTouchBounds;
 
     function initialize(game, onComplete, onDiscard) {
         WatchUi.View.initialize();
@@ -16,6 +18,7 @@ class SimpleEntryView extends WatchUi.View {
         _onDiscard = onDiscard;
         _saveFailed = false;
         _discardRequested = false;
+        _discardTouchBounds = null;
         resetSelectionToMax();
     }
 
@@ -84,6 +87,7 @@ class SimpleEntryView extends WatchUi.View {
         drawFrameCard(dc, centerX, layout);
         drawPinSelector(dc, width, height, layout);
         drawConfirmHint(dc, width, height, layout);
+        drawDiscardHint(dc, width, height, layout);
     }
 
     private function clampSelection() {
@@ -199,6 +203,39 @@ class SimpleEntryView extends WatchUi.View {
         dc.setPenWidth(1);
     }
 
+    private function drawDiscardHint(dc, width, height, layout) {
+        _discardTouchBounds = null;
+        if (!System.getDeviceSettings().isTouchScreen) {
+            return;
+        }
+
+        var x = width / 2;
+        var y = height - layout.discardIconBottomInset;
+        var size = layout.confirmIconSize;
+        var halfSize = size / 2;
+        var hitRadius = size;
+
+        // Keep discard centered so it reads as a touch action, not a button hint.
+        dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(layout.confirmIconPenWidth);
+        dc.drawLine(x - halfSize, y - halfSize, x + halfSize, y + halfSize);
+        dc.drawLine(x + halfSize, y - halfSize, x - halfSize, y + halfSize);
+        dc.setPenWidth(1);
+
+        _discardTouchBounds = [x - hitRadius, y - hitRadius, x + hitRadius, y + hitRadius];
+    }
+
+    function isDiscardTap(coordinates) {
+        if (_discardTouchBounds == null) {
+            return false;
+        }
+
+        return coordinates[0] >= _discardTouchBounds[0]
+            && coordinates[0] <= _discardTouchBounds[2]
+            && coordinates[1] >= _discardTouchBounds[1]
+            && coordinates[1] <= _discardTouchBounds[3];
+    }
+
     private function drawCenteredText(dc, x, y, font, text) {
         dc.drawText(x, y, font, text, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
@@ -289,18 +326,34 @@ class SimpleEntryDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
-    function onSelect() {
-        if (_view != null) {
-            _view.acceptSelection();
+    function onKey(event) {
+        var key = event.getKey();
+        if (key != WatchUi.KEY_ENTER && key != WatchUi.KEY_START) {
+            return false;
+        }
+
+        acceptSelection();
+        return true;
+    }
+
+    function onTap(event) {
+        if (_view != null && _view.isDiscardTap(event.getCoordinates())) {
+            showDiscardConfirmation();
+        } else {
+            acceptSelection();
         }
 
         return true;
     }
 
+    function onMenu() {
+        showDiscardConfirmation();
+        return true;
+    }
+
     function onBack() {
         if (_view != null && _view.hasSaveFailed()) {
-            var confirmation = new WatchUi.Confirmation("Discard unsaved game?");
-            WatchUi.pushView(confirmation, new BowlingDiscardUnsavedGameConfirmationDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
+            showDiscardConfirmation();
             return true;
         }
 
@@ -310,5 +363,21 @@ class SimpleEntryDelegate extends WatchUi.BehaviorDelegate {
 
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
+    }
+
+    private function acceptSelection() {
+        if (_view != null) {
+            _view.acceptSelection();
+        }
+    }
+
+    private function showDiscardConfirmation() {
+        if (_view == null) {
+            return;
+        }
+
+        var message = _view.hasSaveFailed() ? "Discard unsaved game?" : "Discard current game?";
+        var confirmation = new WatchUi.Confirmation(message);
+        WatchUi.pushView(confirmation, new BowlingDiscardGameConfirmationDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
     }
 }

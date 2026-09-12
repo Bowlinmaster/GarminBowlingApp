@@ -1,6 +1,6 @@
 import Toybox.WatchUi;
 
-class BowlingDiscardUnsavedGameConfirmationDelegate extends WatchUi.ConfirmationDelegate {
+class BowlingDiscardGameConfirmationDelegate extends WatchUi.ConfirmationDelegate {
     var _view;
 
     function initialize(view) {
