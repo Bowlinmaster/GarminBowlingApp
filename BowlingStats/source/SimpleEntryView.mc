@@ -206,7 +206,7 @@ class SimpleEntryView extends WatchUi.View {
 
     private function drawDiscardHint(dc, width, height, layout) {
         _discardTouchBounds = null;
-        if (!System.getDeviceSettings().isTouchScreen) {
+        if (_saveFailed || !System.getDeviceSettings().isTouchScreen) {
             return;
         }
 
