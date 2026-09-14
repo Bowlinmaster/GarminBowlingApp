@@ -2,6 +2,8 @@
 
 The visual gallery is a development-only Connect IQ app that renders production views with deterministic data. Its separate manifest and source path keep gallery code out of normal debug and release builds.
 
+Run this workflow whenever a change may affect a rendered screen, including changes to views, drawing code, layout profiles, fonts, strings, menus, dialogs, or visual resources. Capture every affected scenario on each affected representative device before committing the change.
+
 ## Build The Gallery
 
 Build one representative device while iterating:
