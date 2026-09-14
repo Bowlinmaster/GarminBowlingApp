@@ -26,3 +26,19 @@ Run the compatibility script from the repository root:
 Add `-RunTests` when the Connect IQ simulator is already running. Add `-Package` before a release or after changing the manifest.
 
 The script uses Garmin's configured current SDK by default. Pass `-SdkPath` to test against a specific SDK installation.
+
+## Visual Verification
+
+Use the development-only visual gallery and baseline comparator for layout changes. The full capture, comparison, and intentional-update workflow is documented in [`BowlingStats/visual-baselines/README.md`](BowlingStats/visual-baselines/README.md).
+
+Build a gallery for one representative device with:
+
+```powershell
+.\tools\Build-VisualGallery.ps1 -DeveloperKey C:\path\to\developer_key -Device fenix7x
+```
+
+After capturing the scenarios listed in the visual manifest, run:
+
+```powershell
+.\tools\Test-VisualBaselines.ps1 -Device fenix7x
+```

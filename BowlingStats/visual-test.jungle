@@ -1,0 +1,2 @@
+project.manifest = visual-test-manifest.xml
+base.sourcePath = source;visual-tests/source

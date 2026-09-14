@@ -25,7 +25,10 @@
 ## Remaining
 
 9. Evaluate secondary device families.
-13. Establish visual regression checks.
+13. Establish visual regression checks:
+   - Done: add a deterministic, development-only visual gallery.
+   - Done: add a manifest-driven baseline and pixel-diff validator.
+   - Remaining: capture and commit the initial representative-device baselines.
 
 ## Future Features
 

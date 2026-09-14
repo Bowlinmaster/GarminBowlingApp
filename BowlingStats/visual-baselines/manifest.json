@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "devices": [
+    { "id": "fr255s", "width": 218, "height": 218 },
+    { "id": "fenix7s", "width": 240, "height": 240 },
+    { "id": "fenix7", "width": 260, "height": 260 },
+    { "id": "fenix7x", "width": 280, "height": 280 },
+    { "id": "fr265s", "width": 360, "height": 360 },
+    { "id": "vivoactive6", "width": 390, "height": 390 },
+    { "id": "fr265", "width": 416, "height": 416 },
+    { "id": "fr970", "width": 454, "height": 454 },
+    { "id": "venusq2", "width": 320, "height": 360 }
+  ],
+  "scenarios": [
+    { "id": "new-game", "label": "New game" },
+    { "id": "second-ball", "label": "Second ball and potential spare" },
+    { "id": "tenth-frame", "label": "Tenth-frame bonus roll" },
+    { "id": "completed-game", "label": "Completed perfect game" },
+    { "id": "save-failure", "label": "Save failure" },
+    { "id": "empty-history", "label": "Empty saved-game history" },
+    { "id": "saved-games", "label": "Saved-game list" },
+    { "id": "game-detail", "label": "Saved-game detail" },
+    { "id": "discard-dialog", "label": "Discard confirmation" }
+  ]
+}

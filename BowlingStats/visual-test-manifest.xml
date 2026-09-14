@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<iq:manifest version="3" xmlns:iq="http://www.garmin.com/xml/connectiq">
+    <iq:application id="ad638481-5589-4ace-950c-3f64033bf350" type="watch-app" name="@Strings.AppName" entry="BowlingVisualTestApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="3.0.0">
+        <iq:products>
+            <iq:product id="fr255s"/>
+            <iq:product id="fenix7s"/>
+            <iq:product id="fenix7"/>
+            <iq:product id="fenix7x"/>
+            <iq:product id="fr265s"/>
+            <iq:product id="vivoactive6"/>
+            <iq:product id="fr265"/>
+            <iq:product id="fr970"/>
+            <iq:product id="venusq2"/>
+        </iq:products>
+        <iq:permissions/>
+        <iq:languages>
+            <iq:language>eng</iq:language>
+        </iq:languages>
+        <iq:barrels/>
+    </iq:application>
+</iq:manifest>
