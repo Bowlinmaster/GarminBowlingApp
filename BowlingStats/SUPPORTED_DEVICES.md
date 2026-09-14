@@ -31,19 +31,20 @@ An unknown product may receive a screen-size fallback profile. A fallback render
 - SDK: Connect IQ 9.1.0
 - Checked: 2026-09-12
 - Result: full release package passed all 52 SDK-expanded builds for the 37 manifest product IDs
-- Visual baseline: `fenix7x`
+- Visual baselines checked: 2026-09-14
+- Visual baseline result: all nine scenarios captured for all nine representative screen families
 
 ## Compatibility Matrix
 
-Every row below passed the current release package build. `Pending` means that simulator screenshots and input behavior still need explicit review before the product is promoted to officially supported.
+Every row below passed the current release package build. `Visual baseline` means the product's deterministic gallery scenarios were captured and committed. `Pending` means that simulator screenshots or input behavior still need explicit review before the product is promoted to officially supported.
 
 | Product ID | Garmin device family | Part number(s) | Screen | Display | Input | Layout profile | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `enduro3` | Enduro 3 | `006-B4575-00` | 280x280 round | MIP | Touch + buttons | `enduro3()` | Build verified; visual pending |
-| `fenix7` | fenix 7 / quatix 7 | `006-B3906-00`, `006-B3909-00` | 260x260 round | MIP | Touch + buttons | `fenix7()` | Build verified; visual pending |
+| `fenix7` | fenix 7 / quatix 7 | `006-B3906-00`, `006-B3909-00` | 260x260 round | MIP | Touch + buttons | `fenix7()` | Build verified; visual baseline |
 | `fenix7pro` | fenix 7 Pro | `006-B4375-00` | 260x260 round | MIP | Touch + buttons | `fenix7Pro()` | Build verified; visual pending |
 | `fenix7pronowifi` | fenix 7 Pro Solar, no Wi-Fi | `006-B4595-00` | 260x260 round | MIP | Touch + buttons | `fenix7ProNoWifi()` | Build verified; visual pending |
-| `fenix7s` | fenix 7S | `006-B3905-00`, `006-B3908-00` | 240x240 round | MIP | Touch + buttons | `fenix7s()` | Build verified; visual pending |
+| `fenix7s` | fenix 7S | `006-B3905-00`, `006-B3908-00` | 240x240 round | MIP | Touch + buttons | `fenix7s()` | Build verified; visual baseline |
 | `fenix7spro` | fenix 7S Pro | `006-B4374-00` | 240x240 round | MIP | Touch + buttons | `fenix7sPro()` | Build verified; visual pending |
 | `fenix7x` | fenix 7X / tactix 7 / quatix 7X Solar / Enduro 2 | `006-B3907-00`, `006-B3910-00`, `006-B4135-00`, `006-B4341-00` | 280x280 round | MIP | Touch + buttons | `fenix7x()` | Official; simulator baseline and physical use reported |
 | `fenix7xpro` | fenix 7X Pro | `006-B4376-00` | 280x280 round | MIP | Touch + buttons | `fenix7xPro()` | Build verified; visual pending |
@@ -56,15 +57,15 @@ Every row below passed the current release package build. `Pending` means that s
 | `fr165m` | Forerunner 165 Music | `006-B4433-00` | 390x390 round | AMOLED | Touch + buttons | `fr165Music()` | Build verified; visual pending |
 | `fr255` | Forerunner 255 | `006-B3992-00` | 260x260 round | MIP | Buttons | `fr255()` | Build verified; visual pending |
 | `fr255m` | Forerunner 255 Music | `006-B3990-00` | 260x260 round | MIP | Buttons | `fr255Music()` | Build verified; visual pending |
-| `fr255s` | Forerunner 255S | `006-B3993-00` | 218x218 round | MIP | Buttons | `fr255s()` | Build verified; visual pending |
+| `fr255s` | Forerunner 255S | `006-B3993-00` | 218x218 round | MIP | Buttons | `fr255s()` | Build verified; visual baseline |
 | `fr255sm` | Forerunner 255S Music | `006-B3991-00` | 218x218 round | MIP | Buttons | `fr255sMusic()` | Build verified; visual pending |
-| `fr265` | Forerunner 265 | `006-B4257-00` | 416x416 round | AMOLED | Touch + buttons | `fr265()` | Build verified; visual pending |
-| `fr265s` | Forerunner 265S | `006-B4258-00` | 360x360 round | AMOLED | Touch + buttons | `fr265s()` | Build verified; visual pending |
+| `fr265` | Forerunner 265 | `006-B4257-00` | 416x416 round | AMOLED | Touch + buttons | `fr265()` | Build verified; visual baseline |
+| `fr265s` | Forerunner 265S | `006-B4258-00` | 360x360 round | AMOLED | Touch + buttons | `fr265s()` | Build verified; visual baseline |
 | `fr57042mm` | Forerunner 570 42mm | `006-B4574-00` | 390x390 round | AMOLED | Touch + buttons | `fr57042mm()` | Build verified; visual pending |
 | `fr57047mm` | Forerunner 570 47mm | `006-B4570-00` | 454x454 round | AMOLED | Touch + buttons | `fr57047mm()` | Build verified; visual pending |
 | `fr955` | Forerunner 955 / Solar | `006-B4024-00` | 260x260 round | MIP | Touch + buttons | `fr955()` | Build verified; visual pending |
 | `fr965` | Forerunner 965 | `006-B4315-00` | 454x454 round | AMOLED | Touch + buttons | `fr965()` | Build verified; visual pending |
-| `fr970` | Forerunner 970 | `006-B4565-00` | 454x454 round | AMOLED | Touch + buttons | `fr970()` | Build verified; visual pending |
+| `fr970` | Forerunner 970 | `006-B4565-00` | 454x454 round | AMOLED | Touch + buttons | `fr970()` | Build verified; visual baseline |
 | `venu2` | Venu 2 | `006-B3703-00`, `006-B3950-00`, `006-B4171-00`, `006-B4180-00` | 416x416 round | AMOLED | Touch + buttons | `venu2()` | Build verified; visual pending |
 | `venu2plus` | Venu 2 Plus | `006-B3851-00`, `006-B4017-00` | 416x416 round | AMOLED | Touch + buttons | `venu2Plus()` | Build verified; visual pending |
 | `venu2s` | Venu 2S | `006-B3704-00`, `006-B3949-00`, `006-B4175-00`, `006-B4181-00` | 360x360 round | AMOLED | Touch + buttons | `venu2s()` | Build verified; visual pending |
@@ -72,10 +73,10 @@ Every row below passed the current release package build. `Pending` means that s
 | `venu3s` | Venu 3S | `006-B4261-00` | 390x390 round | AMOLED | Touch + buttons | `venu3s()` | Build verified; visual pending |
 | `venu441mm` | Venu 4 41mm | `006-B4644-00` | 390x390 round | AMOLED | Touch + buttons | `venu441mm()` | Build verified; visual pending |
 | `venu445mm` | Venu 4 45mm / D2 Air X15 | `006-B4643-00`, `006-B4944-00` | 454x454 round | AMOLED | Touch + buttons | `venu445mm()` | Build verified; visual pending |
-| `venusq2` | Venu Sq 2 | `006-B4115-00` | 320x360 rectangular | AMOLED | Touch + buttons | `venuSq2()` | Build verified; visual pending |
+| `venusq2` | Venu Sq 2 | `006-B4115-00` | 320x360 rectangular | AMOLED | Touch + buttons | `venuSq2()` | Build verified; visual baseline |
 | `venusq2m` | Venu Sq 2 Music | `006-B4116-00` | 320x360 rectangular | AMOLED | Touch + buttons | `venuSq2Music()` | Build verified; visual pending |
 | `vivoactive5` | vivoactive 5 | `006-B4426-00` | 390x390 round | AMOLED | Touch + buttons | `vivoactive5()` | Build verified; visual pending |
-| `vivoactive6` | vivoactive 6 | `006-B4625-00` | 390x390 round | AMOLED | Touch + buttons | `vivoactive6()` | Build verified; visual pending |
+| `vivoactive6` | vivoactive 6 | `006-B4625-00` | 390x390 round | AMOLED | Touch + buttons | `vivoactive6()` | Build verified; visual baseline |
 
 ## Representative Visual Matrix
 
@@ -83,15 +84,15 @@ Visual reviews should cover at least one product from every row before a release
 
 | Screen family | Initial representative | Status |
 | --- | --- | --- |
-| 218x218 round MIP, buttons | `fr255s` | Pending |
-| 240x240 round MIP | `fenix7s` | Pending |
-| 260x260 round MIP | `fenix7` | Pending |
-| 280x280 round MIP | `fenix7x` | Verified baseline |
-| 360x360 round AMOLED | `fr265s` | Pending |
-| 390x390 round AMOLED | `vivoactive5` | Pending |
-| 416x416 round AMOLED | `fr265` | Pending |
-| 454x454 round AMOLED | `fr965` | Pending |
-| 320x360 rectangular AMOLED | `venusq2` | Pending |
+| 218x218 round MIP, buttons | `fr255s` | Verified baseline (9 scenarios) |
+| 240x240 round MIP | `fenix7s` | Verified baseline (9 scenarios) |
+| 260x260 round MIP | `fenix7` | Verified baseline (9 scenarios) |
+| 280x280 round MIP | `fenix7x` | Verified baseline (9 scenarios) |
+| 360x360 round AMOLED | `fr265s` | Verified baseline (9 scenarios) |
+| 390x390 round AMOLED | `vivoactive6` | Verified baseline (9 scenarios) |
+| 416x416 round AMOLED | `fr265` | Verified baseline (9 scenarios) |
+| 454x454 round AMOLED | `fr970` | Verified baseline (9 scenarios) |
+| 320x360 rectangular AMOLED | `venusq2` | Verified baseline (9 scenarios) |
 
 ## Validation Checklist
 

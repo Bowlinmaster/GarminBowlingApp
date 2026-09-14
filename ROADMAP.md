@@ -13,6 +13,10 @@
 10. Make device-support contributions straightforward.
 11. Add a GitHub device-request issue template.
 12. Automate local compatibility checks.
+13. Establish visual regression checks:
+   - Add a deterministic, development-only visual gallery.
+   - Add a manifest-driven baseline and pixel-diff validator.
+   - Capture and commit all nine scenarios for the nine representative devices.
 14. Complete release-quality cleanup:
    - Add Monkey C container and method type annotations.
    - Eliminate compiler warnings in application and test builds.
@@ -25,10 +29,6 @@
 ## Remaining
 
 9. Evaluate secondary device families.
-13. Establish visual regression checks:
-   - Done: add a deterministic, development-only visual gallery.
-   - Done: add a manifest-driven baseline and pixel-diff validator.
-   - Remaining: capture and commit the initial representative-device baselines.
 
 ## Future Features
 
