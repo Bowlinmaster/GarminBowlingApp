@@ -37,6 +37,22 @@ if (@(Compare-Object $supportedDevices $visualDevices).Count -gt 0) {
     throw "Visual-test manifest products and visual baseline devices do not match."
 }
 
+$connectIqRoot = Split-Path -Parent (Split-Path -Parent $SdkPath)
+$deviceRoot = Join-Path $connectIqRoot "Devices"
+foreach ($deviceEntry in $baselineManifest.devices) {
+    $simulatorPath = Join-Path $deviceRoot "$($deviceEntry.id)\simulator.json"
+    if (!(Test-Path -LiteralPath $simulatorPath)) {
+        throw "Simulator metadata missing for visual-test device '$($deviceEntry.id)'."
+    }
+
+    $simulator = Get-Content -LiteralPath $simulatorPath -Raw | ConvertFrom-Json
+    if ($simulator.display.shape -ne $deviceEntry.shape -or
+        $simulator.display.location.width -ne $deviceEntry.width -or
+        $simulator.display.location.height -ne $deviceEntry.height) {
+        throw "Visual geometry for '$($deviceEntry.id)' does not match the configured SDK."
+    }
+}
+
 if (!$Device) {
     $Device = $visualDevices
 }

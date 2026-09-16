@@ -13,7 +13,9 @@ Before completing a UI-affecting change:
 3. Ask the user to capture the affected screens into
    `BowlingStats/visual-captures/<device>/<scenario>.png` when fresh simulator
    screenshots are not already available.
-4. Run `tools/Test-VisualBaselines.ps1` for the affected devices and scenarios.
+4. Run `tools/Test-VisualBaselines.ps1` for the affected devices and scenarios,
+   then inspect the generated shape-aware previews under
+   `BowlingStats/bin/visual-previews` for clipped or near-edge content.
 5. Update committed baselines with `-UpdateBaselines` only after the visual
    differences have been reviewed and confirmed as intentional.
 

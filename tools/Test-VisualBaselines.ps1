@@ -2,10 +2,12 @@ param(
     [string]$ManifestPath,
     [string]$BaselineRoot,
     [string]$CandidateRoot,
+    [string]$PreviewRoot,
     [string[]]$Device,
     [string[]]$Scenario,
     [double]$MaxChangedPercent = 0.25,
     [int]$ChannelTolerance = 8,
+    [switch]$FailOnClipping,
     [switch]$UpdateBaselines
 )
 
@@ -22,6 +24,9 @@ if ([string]::IsNullOrWhiteSpace($BaselineRoot)) {
 if ([string]::IsNullOrWhiteSpace($CandidateRoot)) {
     $CandidateRoot = Join-Path $projectRoot "visual-captures"
 }
+if ([string]::IsNullOrWhiteSpace($PreviewRoot)) {
+    $PreviewRoot = Join-Path $projectRoot "bin\visual-previews"
+}
 
 if (!(Test-Path -LiteralPath $ManifestPath)) {
     throw "Visual baseline manifest not found: $ManifestPath"
@@ -35,7 +40,7 @@ if ($ChannelTolerance -lt 0 -or $ChannelTolerance -gt 255) {
 
 Add-Type -AssemblyName System.Drawing
 $manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
-if ($manifest.schemaVersion -ne 1 -or $manifest.devices.Count -eq 0 -or $manifest.scenarios.Count -eq 0) {
+if ($manifest.schemaVersion -ne 2 -or $manifest.devices.Count -eq 0 -or $manifest.scenarios.Count -eq 0) {
     throw "Visual baseline manifest is empty or uses an unsupported schema."
 }
 
@@ -55,6 +60,23 @@ foreach ($requestedScenario in @($Scenario | Where-Object { ![string]::IsNullOrW
 $selectedDevices = @($manifest.devices | Where-Object { !$Device -or $Device -contains $_.id })
 $selectedScenarios = @($manifest.scenarios | Where-Object { !$Scenario -or $Scenario -contains $_.id })
 $diffRoot = Join-Path $projectRoot "bin\visual-diffs"
+
+$previewArguments = @{
+    ManifestPath = $ManifestPath
+    ImageRoot = $CandidateRoot
+    OutputRoot = $PreviewRoot
+    ChannelTolerance = $ChannelTolerance
+}
+if ($Device) {
+    $previewArguments.Device = $Device
+}
+if ($Scenario) {
+    $previewArguments.Scenario = $Scenario
+}
+if ($FailOnClipping) {
+    $previewArguments.FailOnClipping = $true
+}
+& (Join-Path $PSScriptRoot "New-VisualPreviews.ps1") @previewArguments
 
 function Get-VisualImageSize([string]$Path) {
     $image = [System.Drawing.Image]::FromFile($Path)

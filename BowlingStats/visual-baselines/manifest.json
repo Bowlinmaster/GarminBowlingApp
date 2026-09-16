@@ -1,15 +1,16 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "backgroundColor": "000000",
   "devices": [
-    { "id": "fr255s", "width": 218, "height": 218 },
-    { "id": "fenix7s", "width": 240, "height": 240 },
-    { "id": "fenix7", "width": 260, "height": 260 },
-    { "id": "fenix7x", "width": 280, "height": 280 },
-    { "id": "fr265s", "width": 360, "height": 360 },
-    { "id": "vivoactive6", "width": 390, "height": 390 },
-    { "id": "fr265", "width": 416, "height": 416 },
-    { "id": "fr970", "width": 454, "height": 454 },
-    { "id": "venusq2", "width": 320, "height": 360 }
+    { "id": "fr255s", "width": 218, "height": 218, "shape": "round", "safeInset": 6 },
+    { "id": "fenix7s", "width": 240, "height": 240, "shape": "round", "safeInset": 7 },
+    { "id": "fenix7", "width": 260, "height": 260, "shape": "round", "safeInset": 8 },
+    { "id": "fenix7x", "width": 280, "height": 280, "shape": "round", "safeInset": 8 },
+    { "id": "fr265s", "width": 360, "height": 360, "shape": "round", "safeInset": 10 },
+    { "id": "vivoactive6", "width": 390, "height": 390, "shape": "round", "safeInset": 11 },
+    { "id": "fr265", "width": 416, "height": 416, "shape": "round", "safeInset": 12 },
+    { "id": "fr970", "width": 454, "height": 454, "shape": "round", "safeInset": 13 },
+    { "id": "venusq2", "width": 320, "height": 360, "shape": "rectangle", "safeInset": 8 }
   ],
   "scenarios": [
     { "id": "new-game", "label": "New game" },

@@ -37,6 +37,8 @@
    - Resize the saved-game detail grid rows or typography so frame numbers,
      rolls, and cumulative scores do not cross separators on the AMOLED and
      rectangular profiles.
+   - Keep Saved Games titles, detail headers, and page indicators inside the
+     physical and recommended content boundaries on round displays.
    - Separate the saved-game date and score columns on the 320x360 rectangular
      profile so their text cannot overlap.
 

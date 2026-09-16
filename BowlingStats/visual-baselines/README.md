@@ -31,6 +31,18 @@ For each device and scenario in `manifest.json`:
 
 The `visual-captures` directory is ignored by Git. Do not capture the simulator window, bezel, title bar, or status bar.
 
+## Review Physical Screen Shapes
+
+Generate shape-aware previews without running a baseline comparison:
+
+```powershell
+.\tools\New-VisualPreviews.ps1 -Device fenix7x -Scenario tenth-frame
+```
+
+The command reads each device's shape and safe inset from `manifest.json` and writes derived images under `BowlingStats/bin/visual-previews`. Round-device previews use a cyan physical boundary and a yellow recommended content boundary. Magenta pixels are content outside the physical display; orange pixels are visible but inside the near-edge caution area. Rectangular devices receive the same yellow safe-area guide without a circular crop. Gallery builds validate the declared shape and dimensions against the configured SDK's `simulator.json` metadata.
+
+Shape findings are warnings by default because native controls and intentional full-screen backgrounds may use edge pixels. Pass `-FailOnClipping` to either preview or comparison script when a workflow requires clipped foreground content to fail the command. Generated previews are review artifacts and must not be committed.
+
 ## Compare Or Update
 
 Compare all captures with committed baselines:
@@ -52,5 +64,7 @@ After reviewing intentional changes, update baselines explicitly:
 ```
 
 The comparator validates required files and dimensions, tolerates channel differences of up to 8, and allows at most 0.25 percent changed pixels by default. Failed comparisons create magenta-highlighted images under `BowlingStats/bin/visual-diffs`.
+
+Every comparison also regenerates shape-aware previews and reports clipped or near-edge content. Review both the raw pixel diff and the physical-screen preview before accepting an intentional visual change.
 
 Baseline updates should be committed with the UI change they represent. Never update a baseline solely to make a failing comparison pass.
