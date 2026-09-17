@@ -133,7 +133,9 @@ class SimpleEntryView extends WatchUi.View {
         }
 
         var scoreText = score == null ? "" : score.toString();
-        dc.drawText(centerX, bodyTop + layout.scoreYOffset, layout.scoreFont, scoreText, Graphics.TEXT_JUSTIFY_CENTER);
+        var scoreAreaTop = bodyTop + rollBoxHeight;
+        var scoreAreaHeight = bodyHeight - rollBoxHeight;
+        drawCenteredText(dc, centerX, scoreAreaTop + (scoreAreaHeight / 2), layout.scoreFont, scoreText);
     }
 
     private function drawStandardFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout) {

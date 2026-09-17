@@ -1,6 +1,6 @@
 import Toybox.Application;
+import Toybox.Graphics;
 import Toybox.Lang;
-import Toybox.System;
 import Toybox.WatchUi;
 
 class BowlingVisualTestApp extends Application.AppBase {
@@ -9,27 +9,95 @@ class BowlingVisualTestApp extends Application.AppBase {
     }
 
     function getInitialView() as [Views] or [Views, InputDelegates] {
-        var menu = new WatchUi.Menu2({ :title => "Visual Gallery" });
-        menu.addItem(new WatchUi.MenuItem("01 New game", null, "new-game", null));
-        menu.addItem(new WatchUi.MenuItem("02 Second ball", null, "second-ball", null));
-        menu.addItem(new WatchUi.MenuItem("03 Tenth frame", null, "tenth-frame", null));
-        menu.addItem(new WatchUi.MenuItem("04 Completed game", null, "completed-game", null));
-        menu.addItem(new WatchUi.MenuItem("05 Save failure", null, "save-failure", null));
-        menu.addItem(new WatchUi.MenuItem("06 Empty history", null, "empty-history", null));
-        menu.addItem(new WatchUi.MenuItem("07 Saved games", null, "saved-games", null));
-        menu.addItem(new WatchUi.MenuItem("08 Game detail", null, "game-detail", null));
-        menu.addItem(new WatchUi.MenuItem("09 Discard dialog", null, "discard-dialog", null));
-        return [menu, new BowlingVisualTestMenuDelegate()];
+        var view = new BowlingVisualGalleryView();
+        return [view, new BowlingVisualTestMenuDelegate(view)];
     }
 }
 
-class BowlingVisualTestMenuDelegate extends WatchUi.Menu2InputDelegate {
+class BowlingVisualGalleryView extends WatchUi.View {
+    private var _selectedIndex as Number;
+    private var _width as Number;
+    private var _height as Number;
+
     function initialize() {
-        WatchUi.Menu2InputDelegate.initialize();
+        WatchUi.View.initialize();
+        _selectedIndex = 0;
+        _width = 0;
+        _height = 0;
     }
 
-    function onSelect(item as MenuItem) as Void {
-        var id = item.getId() as String;
+    function setSelectedIndex(index as Number) as Void {
+        _selectedIndex = index;
+    }
+
+    function onUpdate(dc as Dc) as Void {
+        _width = dc.getWidth();
+        _height = dc.getHeight();
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.clear();
+
+        var cellWidth = _width / 3;
+        var cellHeight = _height / 3;
+        for (var index = 0; index < 9; index++) {
+            var column = index % 3;
+            var row = (index / 3).toNumber();
+            var centerX = (column * cellWidth) + (cellWidth / 2);
+            var centerY = (row * cellHeight) + (cellHeight / 2);
+            if (index == _selectedIndex) {
+                dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_WHITE);
+                dc.fillRectangle(column * cellWidth, row * cellHeight, cellWidth, cellHeight);
+                dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+            } else {
+                dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+                dc.drawRectangle(column * cellWidth, row * cellHeight, cellWidth, cellHeight);
+            }
+            dc.drawText(centerX, centerY, Graphics.FONT_SMALL, (index + 1).format("%02d"), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        }
+    }
+}
+
+class BowlingVisualTestMenuDelegate extends WatchUi.BehaviorDelegate {
+    private var _view as BowlingVisualGalleryView;
+    private var _selectedIndex as Number;
+    private const SCENARIO_IDS = [
+        "new-game",
+        "second-ball",
+        "tenth-frame",
+        "completed-game",
+        "save-failure",
+        "empty-history",
+        "saved-games",
+        "game-detail",
+        "discard-dialog"
+    ];
+
+    function initialize(view as BowlingVisualGalleryView) {
+        WatchUi.BehaviorDelegate.initialize();
+        _view = view;
+        _selectedIndex = 0;
+    }
+
+    function onNextPage() as Boolean {
+        _selectedIndex = (_selectedIndex + 1) % SCENARIO_IDS.size();
+        _view.setSelectedIndex(_selectedIndex);
+        WatchUi.requestUpdate();
+        return true;
+    }
+
+    function onPreviousPage() as Boolean {
+        _selectedIndex = (_selectedIndex + SCENARIO_IDS.size() - 1) % SCENARIO_IDS.size();
+        _view.setSelectedIndex(_selectedIndex);
+        WatchUi.requestUpdate();
+        return true;
+    }
+
+    function onSelect() as Boolean {
+        openScenario(_selectedIndex);
+        return true;
+    }
+
+    private function openScenario(index as Number) as Void {
+        var id = SCENARIO_IDS[index];
 
         if (id.equals("new-game")) {
             pushEntryView(new BowlingGame(), false);
@@ -63,8 +131,8 @@ class BowlingVisualTestMenuDelegate extends WatchUi.Menu2InputDelegate {
         }
     }
 
-    function onBack() as Void {
-        System.exit();
+    function onBack() as Boolean {
+        return true;
     }
 
     private function pushEntryView(game as BowlingGame, forceSaveFailure as Boolean) as Void {

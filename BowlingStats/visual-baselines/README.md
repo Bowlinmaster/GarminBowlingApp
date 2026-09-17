@@ -4,7 +4,91 @@ The visual gallery is a development-only Connect IQ app that renders production 
 
 Run this workflow whenever a change may affect a rendered screen, including changes to views, drawing code, layout profiles, fonts, strings, menus, dialogs, or visual resources. Capture every affected scenario on each affected representative device before committing the change.
 
-## Build The Gallery
+## Automated Capture
+
+The automated workflow builds the development gallery, launches each requested
+device and scenario, saves display-only PNGs with the expected names, validates
+their dimensions, and runs the baseline and shape-aware comparison:
+
+```powershell
+$env:GARMIN_DEVELOPER_KEY = "C:\path\to\developer_key"
+.\tools\Capture-VisualGallery.ps1 -All -Overwrite
+```
+
+Limit a run while iterating:
+
+```powershell
+.\tools\Capture-VisualGallery.ps1 `
+    -Device fenix7x,venusq2 `
+    -Scenario new-game,tenth-frame,game-detail `
+    -Overwrite
+```
+
+Use `-SkipBuild` when the gallery PRGs are current. Existing captures are not
+replaced unless `-Overwrite` is present. For a dry run that must not touch the
+normal capture directory or compare against baselines, use:
+
+```powershell
+.\tools\Capture-VisualGallery.ps1 `
+    -Device fenix7x `
+    -OutputRoot .\BowlingStats\bin\capture-test `
+    -SkipBuild `
+    -SkipComparison `
+    -Overwrite
+```
+
+The automation uses Garmin's own **Save Screen Capture** command. The gallery's
+development-only 3-by-3 scenario grid provides deterministic button and touch
+navigation; it is not included in production builds or baseline screenshots.
+
+## Manual Launch
+
+The shortest path is the gallery launcher. It resolves the SDK selected by
+Garmin's `current-sdk.cfg`, builds the requested gallery, starts the simulator
+when necessary, launches the matching PRG, and creates its capture directory:
+
+```powershell
+.\tools\Start-VisualGallery.ps1 -DeveloperKey C:\path\to\developer_key -Device fenix7x
+```
+
+Walk through every representative device in manifest order with one command:
+
+```powershell
+.\tools\Start-VisualGallery.ps1 -DeveloperKey C:\path\to\developer_key -All
+```
+
+The all-device session pauses after each launch so its screenshots can be
+captured before the next device replaces it in the simulator. Add `-SkipBuild`
+when the gallery PRGs are already current.
+
+To avoid passing the key on every invocation, set it once for the current
+PowerShell session:
+
+```powershell
+$env:GARMIN_DEVELOPER_KEY = "C:\path\to\developer_key"
+```
+
+Then the launcher only needs `-Device fenix7x` or `-All`.
+
+### Raw SDK commands
+
+The equivalent commands below are useful when diagnosing the launcher. They
+also resolve the currently selected SDK, so installing and selecting a newer
+SDK does not require hard-coded path changes:
+
+```powershell
+$sdk = (Get-Content "$env:APPDATA\Garmin\ConnectIQ\current-sdk.cfg" -Raw).Trim()
+& "$sdk\bin\connectiq.bat"
+& "$sdk\bin\monkeyc.bat" -f .\BowlingStats\visual-test.jungle -d fenix7x -o .\BowlingStats\bin\visual-gallery-fenix7x.prg -y C:\path\to\developer_key -w -l 1
+& "$sdk\bin\monkeydo.bat" .\BowlingStats\bin\visual-gallery-fenix7x.prg fenix7x
+```
+
+For the production app, replace the final two commands with:
+
+```powershell
+& "$sdk\bin\monkeyc.bat" -f .\BowlingStats\monkey.jungle -d fenix7x -o .\BowlingStats\bin\BowlingStats.prg -y C:\path\to\developer_key -w -l 1
+& "$sdk\bin\monkeydo.bat" .\BowlingStats\bin\BowlingStats.prg fenix7x
+```
 
 Build one representative device while iterating:
 
@@ -18,7 +102,10 @@ Omit `-Device` to build all representatives. With the Connect IQ simulator runni
 monkeydo BowlingStats\bin\visual-gallery-fenix7x.prg fenix7x
 ```
 
-The gallery has one numbered menu item for every scenario in `manifest.json`. Back returns to the gallery menu. The gallery uses a different application id, so its seeded and cleared games do not affect the production app's storage.
+The gallery has one numbered grid cell for every scenario in `manifest.json`.
+Use Up or Down and Select on button devices; swipes and a display tap work on
+touch-only devices. The gallery uses a different application id, so its seeded
+and cleared games do not affect the production app's storage.
 
 ## Capture Screenshots
 

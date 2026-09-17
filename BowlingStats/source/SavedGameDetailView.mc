@@ -32,8 +32,8 @@ class SavedGameDetailView extends WatchUi.View {
         var savedGame = _selectedGame as Lang.Dictionary;
         var game = savedGame[BOWLING_SAVED_GAME_MODEL] as BowlingGame;
 
-        drawHeader(dc, savedGame, centerX, height);
-        drawScorecard(dc, game, width, height);
+        var scorecardTop = drawHeader(dc, savedGame, centerX, width, height);
+        drawScorecard(dc, game, width, height, scorecardTop);
         drawPosition(dc, centerX, height);
     }
 
@@ -45,49 +45,62 @@ class SavedGameDetailView extends WatchUi.View {
         drawCenteredText(dc, centerX, centerY + 14, Graphics.FONT_XTINY, bowlingString(Rez.Strings.FinishGameFirst));
     }
 
-    private function drawHeader(dc, savedGame as Lang.Dictionary, centerX, height) {
-        var dateY = height < 260 ? 18 : 24;
-        var scoreY = height < 260 ? 42 : 52;
+    private function drawHeader(dc, savedGame as Lang.Dictionary, centerX, width, height) {
+        var dateText = getSavedAtText(savedGame);
+        var safeInset = BowlingScreenGeometry.getSafeInset(width, height);
+        var dateY = BowlingScreenGeometry.fitTopCenteredTextY(
+            dc,
+            width,
+            height,
+            Graphics.FONT_XTINY,
+            dateText,
+            height < 260 ? 18 : 24,
+            safeInset
+        );
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        drawCenteredText(dc, centerX, dateY, Graphics.FONT_XTINY, getSavedAtText(savedGame));
+        drawCenteredText(dc, centerX, dateY, Graphics.FONT_XTINY, dateText);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         var score = savedGame[BOWLING_SAVED_GAME_SCORE];
         var scoreText = Lang.format(bowlingString(Rez.Strings.ScoreFormat), [score]);
+        var scoreY = dateY + (dc.getFontHeight(Graphics.FONT_XTINY) / 2) +
+            (dc.getFontHeight(Graphics.FONT_MEDIUM) / 2) + 2;
         drawCenteredText(dc, centerX, scoreY, Graphics.FONT_MEDIUM, scoreText);
+
+        return scoreY + (dc.getFontHeight(Graphics.FONT_MEDIUM) / 2) + 8;
     }
 
-    private function drawScorecard(dc, game, width, height) {
-        var totalWidth = width - 28;
+    private function drawScorecard(dc, game, width, height, top) {
+        var lineHeight = dc.getFontHeight(Graphics.FONT_XTINY) + 2;
+        var rowHeight = lineHeight * 3;
+        var rowGap = 4;
+        var gridBottom = top + (rowHeight * 2) + rowGap;
+        var safeInset = BowlingScreenGeometry.getSafeInset(width, height);
+        var totalWidth = BowlingScreenGeometry.getSafeWidthForBand(width, height, top, gridBottom, safeInset);
+        var maximumWidth = width - 28;
+        if (totalWidth <= 0 || totalWidth > maximumWidth) {
+            totalWidth = maximumWidth;
+        }
         if (totalWidth > 360) {
             totalWidth = 360;
         }
 
         var cellWidth = totalWidth / 5;
-        var rowHeight = height < 260 ? 40 : 46;
-        if (height >= 360) {
-            rowHeight = 58;
-        }
-
         var left = (width - (cellWidth * 5)) / 2;
-        var top = height < 260 ? 64 : 76;
-        if (height >= 360) {
-            top = 104;
-        }
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         for (var frameIndex = 0; frameIndex < 10; frameIndex++) {
             var column = frameIndex % 5;
             var row = frameIndex / 5;
             var x = left + (column * cellWidth);
-            var y = top + (row * (rowHeight + 4));
+            var y = top + (row * (rowHeight + rowGap));
             drawMiniFrame(dc, game, frameIndex, x, y, cellWidth, rowHeight);
         }
     }
 
     private function drawMiniFrame(dc, game, frameIndex, x, y, width, height) {
-        var headerHeight = height / 4;
+        var headerHeight = height / 3;
         var rollHeight = height / 3;
         var scoreTop = y + headerHeight + rollHeight;
 
@@ -111,8 +124,18 @@ class SavedGameDetailView extends WatchUi.View {
         }
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        var y = height - (height < 260 ? 20 : 28);
-        drawCenteredText(dc, centerX, y, Graphics.FONT_XTINY, (_selectedIndex + 1).toString() + "/" + _gameCount.toString());
+        var positionText = (_selectedIndex + 1).toString() + "/" + _gameCount.toString();
+        var preferredY = height - (height < 260 ? 20 : 28);
+        var y = BowlingScreenGeometry.fitBottomCenteredTextY(
+            dc,
+            dc.getWidth(),
+            height,
+            Graphics.FONT_XTINY,
+            positionText,
+            preferredY,
+            BowlingScreenGeometry.getSafeInset(dc.getWidth(), height)
+        );
+        drawCenteredText(dc, centerX, y, Graphics.FONT_XTINY, positionText);
     }
 
     private function loadSelectedGame() {
@@ -148,10 +171,6 @@ class SavedGameDetailView extends WatchUi.View {
     private function joinLabels(labels as Array<String>) as String {
         var text = "";
         for (var i = 0; i < labels.size(); i++) {
-            if (i > 0) {
-                text += " ";
-            }
-
             text += labels[i];
         }
 

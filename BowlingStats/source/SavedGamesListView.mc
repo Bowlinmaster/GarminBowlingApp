@@ -63,9 +63,20 @@ class SavedGamesListView extends WatchUi.View {
         var width = dc.getWidth();
         var height = dc.getHeight();
         var centerX = width / 2;
+        var safeInset = BowlingScreenGeometry.getSafeInset(width, height);
+        var title = bowlingString(Rez.Strings.SavedGamesTitle);
+        var titleY = BowlingScreenGeometry.fitTopCenteredTextY(
+            dc,
+            width,
+            height,
+            Graphics.FONT_SMALL,
+            title,
+            height < 260 ? 20 : 28,
+            safeInset
+        );
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        drawCenteredText(dc, centerX, height < 260 ? 20 : 28, Graphics.FONT_SMALL, bowlingString(Rez.Strings.SavedGamesTitle));
+        drawCenteredText(dc, centerX, titleY, Graphics.FONT_SMALL, title);
 
         if (_gameCount == 0) {
             drawCenteredText(dc, centerX, height / 2, Graphics.FONT_XTINY, bowlingString(Rez.Strings.NoSavedGames));
@@ -75,8 +86,17 @@ class SavedGamesListView extends WatchUi.View {
         drawRows(dc, width, height);
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        drawCenteredText(dc, centerX, height - (height < 260 ? 18 : 24), Graphics.FONT_XTINY,
-            (_selectedIndex + 1).toString() + "/" + _gameCount.toString());
+        var positionText = (_selectedIndex + 1).toString() + "/" + _gameCount.toString();
+        var positionY = BowlingScreenGeometry.fitBottomCenteredTextY(
+            dc,
+            width,
+            height,
+            Graphics.FONT_XTINY,
+            positionText,
+            height - (height < 260 ? 18 : 24),
+            safeInset
+        );
+        drawCenteredText(dc, centerX, positionY, Graphics.FONT_XTINY, positionText);
     }
 
     private function drawRows(dc, width, height) {
@@ -106,8 +126,20 @@ class SavedGamesListView extends WatchUi.View {
 
     private function drawSummaryRow(dc, summary as Lang.Dictionary, isSelected, width, y, height) {
         var horizontalInset = width < 260 ? 18 : 28;
-        var left = horizontalInset;
-        var right = width - horizontalInset;
+        var maximumWidth = width - (horizontalInset * 2);
+        var safeWidth = BowlingScreenGeometry.getSafeWidthForBand(
+            width,
+            dc.getHeight(),
+            y,
+            y + height,
+            BowlingScreenGeometry.getSafeInset(width, dc.getHeight())
+        );
+        if (safeWidth <= 0 || safeWidth > maximumWidth) {
+            safeWidth = maximumWidth;
+        }
+
+        var left = (width - safeWidth) / 2;
+        var right = left + safeWidth;
 
         if (isSelected) {
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
@@ -115,14 +147,32 @@ class SavedGamesListView extends WatchUi.View {
         }
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(left + 8, y + (height / 2), Graphics.FONT_XTINY, getSavedAtText(summary), Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(right - 8, y + (height / 2), Graphics.FONT_SMALL, summary[BOWLING_SAVED_GAME_SCORE].toString(), Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
+        var dateText = getSavedAtText(summary, false);
+        var scoreText = summary[BOWLING_SAVED_GAME_SCORE].toString();
+        var dateFont = Graphics.FONT_XTINY;
+        var scoreFont = Graphics.FONT_SMALL;
+        var availableWidth = safeWidth - 16;
+        var contentWidth = dc.getTextWidthInPixels(dateText, dateFont) +
+            dc.getTextWidthInPixels(scoreText, scoreFont) + 10;
+        if (contentWidth > availableWidth) {
+            dateText = getSavedAtText(summary, true);
+        }
+
+        dc.drawText(left + 8, y + (height / 2), dateFont, dateText, Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(right - 8, y + (height / 2), scoreFont, scoreText, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
-    private function getSavedAtText(summary as Lang.Dictionary) {
+    private function getSavedAtText(summary as Lang.Dictionary, compact) {
         var savedAt = summary[BOWLING_SAVED_GAME_SAVED_AT];
         var info = Gregorian.info(new Time.Moment(savedAt), Time.FORMAT_SHORT);
         var year = info.year % 100;
+
+        if (compact) {
+            return info.month.format("%02d") + "/" +
+                   info.day.format("%02d") + " " +
+                   info.hour.format("%02d") + ":" +
+                   info.min.format("%02d");
+        }
 
         return info.month.format("%02d") + "/" +
                info.day.format("%02d") + "/" +

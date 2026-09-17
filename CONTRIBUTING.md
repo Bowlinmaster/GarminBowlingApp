@@ -31,17 +31,22 @@ The script uses Garmin's configured current SDK by default. Pass `-SdkPath` to t
 
 Visual verification is required for changes that may alter rendered screens. This includes changes to views, drawing code, layout profiles, fonts, strings, menus, dialogs, and visual resources. The full capture, comparison, and intentional-update workflow is documented in [`BowlingStats/visual-baselines/README.md`](BowlingStats/visual-baselines/README.md).
 
-Build a gallery for one representative device with:
+Capture and compare one representative device with:
 
 ```powershell
-.\tools\Build-VisualGallery.ps1 -DeveloperKey C:\path\to\developer_key -Device fenix7x
+.\tools\Capture-VisualGallery.ps1 -DeveloperKey C:\path\to\developer_key -Device fenix7x -Overwrite
 ```
 
-After capturing the scenarios listed in the visual manifest, run:
+Limit the automated run to affected scenarios when appropriate:
 
 ```powershell
-.\tools\Test-VisualBaselines.ps1 -Device fenix7x
+.\tools\Capture-VisualGallery.ps1 -Device fenix7x -Scenario new-game,tenth-frame -Overwrite
 ```
+
+The automation builds and launches the development gallery, controls the
+simulator, saves display-only screenshots, validates their dimensions, and
+runs the baseline comparison. See the visual workflow documentation for manual
+launch and capture fallbacks.
 
 Capture and compare every affected scenario on each affected representative device before committing. When a difference is intentional, review the candidate image and then promote it explicitly:
 

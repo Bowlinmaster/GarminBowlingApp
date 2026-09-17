@@ -11,7 +11,6 @@ class BowlingEntryLayoutProfile {
     var rollBoxWidth;
     var rollBoxHeight;
     var firstRollOffset;
-    var scoreYOffset;
     var selectorYOffset;
     var selectorValueOffset;
     var confirmIconRightInset;
@@ -35,7 +34,6 @@ class BowlingEntryLayoutProfile {
         rollBoxWidth = options[:rollBoxWidth];
         rollBoxHeight = options[:rollBoxHeight];
         firstRollOffset = options[:firstRollOffset];
-        scoreYOffset = options[:scoreYOffset];
         selectorYOffset = options[:selectorYOffset];
         selectorValueOffset = options[:selectorValueOffset];
         confirmIconRightInset = options[:confirmIconRightInset];
@@ -257,7 +255,6 @@ class BowlingEntryLayoutProfiles {
             :rollBoxWidth => 34,
             :rollBoxHeight => 30,
             :firstRollOffset => 18,
-            :scoreYOffset => 44,
             :selectorYOffset => 36,
             :selectorValueOffset => 20,
             :confirmIconRightInset => 42,
@@ -433,7 +430,6 @@ class BowlingEntryLayoutProfiles {
         profile.rollBoxWidth = 32;
         profile.rollBoxHeight = 28;
         profile.firstRollOffset = 17;
-        profile.scoreYOffset = 42;
         profile.selectorYOffset = 32;
         profile.confirmIconRightInset = 38;
         profile.confirmIconYOffset = 54;
@@ -457,7 +453,6 @@ class BowlingEntryLayoutProfiles {
         profile.rollBoxWidth = 26;
         profile.rollBoxHeight = 24;
         profile.firstRollOffset = 14;
-        profile.scoreYOffset = 38;
         profile.selectorYOffset = 24;
         profile.confirmIconRightInset = 30;
         profile.confirmIconYOffset = 46;
@@ -470,12 +465,12 @@ class BowlingEntryLayoutProfiles {
         var profile = largeRound();
         profile.name = name;
         profile.cardWidth = 134;
-        profile.headerHeight = 24;
+        profile.headerHeight = 32;
         profile.bodyHeight = 92;
         profile.top = 32;
         profile.rollBoxWidth = 38;
-        profile.rollBoxHeight = 32;
-        profile.scoreYOffset = 54;
+        profile.rollBoxHeight = 34;
+        profile.rollFont = Graphics.FONT_XTINY;
         profile.selectorYOffset = 44;
         profile.confirmIconRightInset = 50;
         profile.confirmIconYOffset = 76;
@@ -489,7 +484,6 @@ class BowlingEntryLayoutProfiles {
         profile.name = name;
         profile.cardWidth = 138;
         profile.top = 34;
-        profile.scoreYOffset = 56;
         profile.selectorYOffset = 46;
         profile.confirmIconRightInset = 54;
         profile.confirmIconYOffset = 82;
@@ -503,7 +497,6 @@ class BowlingEntryLayoutProfiles {
         profile.name = name;
         profile.cardWidth = 140;
         profile.top = 35;
-        profile.scoreYOffset = 56;
         profile.selectorYOffset = 48;
         profile.confirmIconRightInset = 58;
         profile.confirmIconYOffset = 86;
@@ -522,12 +515,12 @@ class BowlingEntryLayoutProfiles {
         var profile = largeRound();
         profile.name = name;
         profile.cardWidth = 136;
-        profile.headerHeight = 24;
+        profile.headerHeight = 34;
         profile.bodyHeight = 90;
         profile.top = 28;
         profile.rollBoxWidth = 38;
-        profile.rollBoxHeight = 32;
-        profile.scoreYOffset = 52;
+        profile.rollBoxHeight = 36;
+        profile.rollFont = Graphics.FONT_XTINY;
         profile.selectorYOffset = 38;
         profile.confirmIconRightInset = 36;
         profile.confirmIconYOffset = 74;
@@ -546,7 +539,6 @@ class BowlingEntryLayoutProfiles {
             :rollBoxWidth => 28,
             :rollBoxHeight => 26,
             :firstRollOffset => 15,
-            :scoreYOffset => 42,
             :selectorYOffset => 30,
             :selectorValueOffset => 18,
             :confirmIconRightInset => 34,
@@ -567,13 +559,12 @@ class BowlingEntryLayoutProfiles {
         return new BowlingEntryLayoutProfile({
             :name => "large-round",
             :cardWidth => 142,
-            :headerHeight => 26,
+            :headerHeight => 34,
             :bodyHeight => 98,
             :top => 36,
             :rollBoxWidth => 40,
-            :rollBoxHeight => 34,
+            :rollBoxHeight => 36,
             :firstRollOffset => 22,
-            :scoreYOffset => 58,
             :selectorYOffset => 50,
             :selectorValueOffset => 24,
             :confirmIconRightInset => 62,
@@ -582,7 +573,7 @@ class BowlingEntryLayoutProfiles {
             :confirmIconPenWidth => 4,
             :discardIconBottomInset => 30,
             :frameNumberFont => Graphics.FONT_XTINY,
-            :rollFont => Graphics.FONT_SMALL,
+            :rollFont => Graphics.FONT_XTINY,
             :scoreFont => Graphics.FONT_LARGE,
             :selectorLabelFont => Graphics.FONT_XTINY,
             :selectorValueFont => Graphics.FONT_LARGE,
