@@ -72,18 +72,25 @@ class SavedGameDetailView extends WatchUi.View {
     }
 
     private function drawScorecard(dc, game, width, height, top) {
-        var lineHeight = dc.getFontHeight(Graphics.FONT_XTINY) + 2;
-        var rowHeight = lineHeight * 3;
-        var rowGap = 4;
+        // Built-in font sizes vary sharply between MIP and AMOLED devices. Keep the
+        // miniature scorecard proportional to the screen instead of the system font.
+        var rowHeight = width <= 280 ? height / 5 : height * 18 / 100;
+        var rowGap = width <= 280 ? 4 : 6;
         var gridBottom = top + (rowHeight * 2) + rowGap;
         var safeInset = BowlingScreenGeometry.getSafeInset(width, height);
         var totalWidth = BowlingScreenGeometry.getSafeWidthForBand(width, height, top, gridBottom, safeInset);
-        var maximumWidth = width - 28;
+        var maximumWidth;
+        if (width != height) {
+            maximumWidth = width - 20;
+        } else if (width <= 240) {
+            maximumWidth = width * 72 / 100;
+        } else if (width <= 280) {
+            maximumWidth = width * 74 / 100;
+        } else {
+            maximumWidth = width * 76 / 100;
+        }
         if (totalWidth <= 0 || totalWidth > maximumWidth) {
             totalWidth = maximumWidth;
-        }
-        if (totalWidth > 360) {
-            totalWidth = 360;
         }
 
         var cellWidth = totalWidth / 5;
@@ -103,19 +110,101 @@ class SavedGameDetailView extends WatchUi.View {
         var headerHeight = height / 3;
         var rollHeight = height / 3;
         var scoreTop = y + headerHeight + rollHeight;
+        var right = x + width - 1;
 
         dc.drawRectangle(x, y, width, height);
-        dc.drawLine(x, y + headerHeight, x + width, y + headerHeight);
-        dc.drawLine(x, scoreTop, x + width, scoreTop);
+        dc.drawLine(x, y + headerHeight, right, y + headerHeight);
+        dc.drawLine(x, scoreTop, right, scoreTop);
 
-        drawCenteredText(dc, x + (width / 2), y + (headerHeight / 2), Graphics.FONT_XTINY, (frameIndex + 1).toString());
+        drawScorecardText(dc, x, y, width, headerHeight, (frameIndex + 1).toString());
 
         var frame = game.getFrame(frameIndex);
-        drawCenteredText(dc, x + (width / 2), y + headerHeight + (rollHeight / 2), Graphics.FONT_XTINY, getFrameRollText(frame, frameIndex));
+        drawScorecardText(dc, x, y + headerHeight, width, rollHeight, getFrameRollText(frame, frameIndex));
 
         var score = game.getCumulativeScoreThrough(frameIndex);
         var scoreText = score == null ? "" : score.toString();
-        drawCenteredText(dc, x + (width / 2), scoreTop + ((height - headerHeight - rollHeight) / 2), Graphics.FONT_XTINY, scoreText);
+        drawScorecardText(dc, x, scoreTop, width, height - headerHeight - rollHeight, scoreText);
+    }
+
+    private function drawScorecardText(dc, x, y, width, height, text) {
+        if (text.equals("")) {
+            return;
+        }
+
+        var characterCount = text.length();
+        var gap = 1;
+        var glyphHeight = height - 4;
+        var glyphWidth = glyphHeight * 3 / 5;
+        var availableWidth = width - 4;
+        var textWidth = (glyphWidth * characterCount) + (gap * (characterCount - 1));
+
+        if (textWidth > availableWidth) {
+            glyphWidth = (availableWidth - (gap * (characterCount - 1))) / characterCount;
+            glyphHeight = glyphWidth * 5 / 3;
+            textWidth = (glyphWidth * characterCount) + (gap * (characterCount - 1));
+        }
+
+        if (glyphWidth < 3) {
+            glyphWidth = 3;
+        }
+        if (glyphHeight < 5) {
+            glyphHeight = 5;
+        }
+
+        var characterX = x + ((width - textWidth) / 2);
+        var characterY = y + ((height - glyphHeight) / 2);
+        dc.setPenWidth(1);
+        for (var i = 0; i < characterCount; i++) {
+            drawScorecardCharacter(dc, characterX, characterY, glyphWidth, glyphHeight, text.substring(i, i + 1));
+            characterX += glyphWidth + gap;
+        }
+        dc.setPenWidth(1);
+    }
+
+    private function drawScorecardCharacter(dc, x, y, width, height, character) {
+        var right = x + width - 1;
+        var middle = y + (height / 2);
+        var bottom = y + height - 1;
+
+        if (character.equals("X")) {
+            dc.drawLine(x, y, right, bottom);
+            dc.drawLine(right, y, x, bottom);
+            return;
+        }
+        if (character.equals("/")) {
+            dc.drawLine(right, y, x, bottom);
+            return;
+        }
+        if (character.equals("-")) {
+            dc.drawLine(x, middle, right, middle);
+            return;
+        }
+
+        var mask = getDigitSegments(character.toNumber());
+        if ((mask & 1) != 0) { dc.drawLine(x, y, right, y); }
+        if ((mask & 2) != 0) { dc.drawLine(right, y, right, middle); }
+        if ((mask & 4) != 0) { dc.drawLine(right, middle, right, bottom); }
+        if ((mask & 8) != 0) { dc.drawLine(x, bottom, right, bottom); }
+        if ((mask & 16) != 0) { dc.drawLine(x, middle, x, bottom); }
+        if ((mask & 32) != 0) { dc.drawLine(x, y, x, middle); }
+        if ((mask & 64) != 0) { dc.drawLine(x, middle, right, middle); }
+    }
+
+    private function getDigitSegments(digit) {
+        switch (digit) {
+            case 0: return 63;
+            case 1: return 6;
+            case 2: return 91;
+            case 3: return 79;
+            case 4: return 102;
+            case 5: return 109;
+            case 6: return 125;
+            case 7: return 7;
+            case 8: return 127;
+            case 9: return 111;
+        }
+
+        return 0;
     }
 
     private function drawPosition(dc, centerX, height) {

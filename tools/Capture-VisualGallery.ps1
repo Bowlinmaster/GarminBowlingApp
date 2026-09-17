@@ -200,26 +200,35 @@ try {
     Add-Type -AssemblyName System.Drawing -ErrorAction Stop
 }
 
-function Get-SimulatorProcess {
-    $process = Get-Process -Name "simulator" -ErrorAction SilentlyContinue |
-        Select-Object -First 1
-    if (!$process) {
-        throw "The Connect IQ simulator window could not be found."
-    }
-    return $process
-}
-
 function Get-SimulatorPanel {
-    $process = Get-SimulatorProcess
-    $simulatorWindow = [VisualGalleryInputInterop]::FindSimulatorWindow($process.Id)
-    if ($simulatorWindow -eq [IntPtr]::Zero) {
-        throw "The Connect IQ simulator window could not be found."
+    param([int]$TimeoutSeconds = 15)
+
+    $deadline = [DateTime]::UtcNow.AddSeconds($TimeoutSeconds)
+    $foundSimulatorWindow = $false
+    do {
+        $processes = @(Get-Process -Name "simulator" -ErrorAction SilentlyContinue |
+            Sort-Object StartTime -Descending)
+        foreach ($process in $processes) {
+            $simulatorWindow = [VisualGalleryInputInterop]::FindSimulatorWindow($process.Id)
+            if ($simulatorWindow -eq [IntPtr]::Zero) {
+                continue
+            }
+
+            $foundSimulatorWindow = $true
+            $panel = [VisualGalleryInputInterop]::FindDevicePanel($simulatorWindow)
+            if ($panel -ne [IntPtr]::Zero) {
+                return $panel
+            }
+        }
+
+        Start-Sleep -Milliseconds 250
+    } while ([DateTime]::UtcNow -lt $deadline)
+
+    if (!$foundSimulatorWindow) {
+        throw "The Connect IQ simulator window could not be found within $TimeoutSeconds seconds. Close any stale simulator processes and try again."
     }
-    $panel = [VisualGalleryInputInterop]::FindDevicePanel($simulatorWindow)
-    if ($panel -eq [IntPtr]::Zero) {
-        throw "The simulator device panel could not be found."
-    }
-    return $panel
+
+    throw "The simulator opened, but its device panel did not become available within $TimeoutSeconds seconds. Make sure a device is selected in the simulator and try again."
 }
 
 function Get-ScaledPoint {
