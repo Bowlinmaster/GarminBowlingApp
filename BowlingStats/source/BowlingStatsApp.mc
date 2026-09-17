@@ -23,7 +23,7 @@ class BowlingStatsApp extends Application.AppBase {
 
     function getInitialView() as [Views] or [Views, InputDelegates] {
         var menu = buildMainMenu();
-        return [menu, new $.BowlingMainMenu2Delegate()];
+        return [menu, new $.BowlingMainMenuDelegate()];
     }
 
     function buildMainMenu() as WatchUi.Menu2 {

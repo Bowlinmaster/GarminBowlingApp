@@ -1,5 +1,6 @@
 <strings>
-    <string id="AppName">BowlingStats</string>
+    <string id="AppName">Bowling Stats</string>
+    <string id="VisualTestAppName" translatable="false">Bowling Stats Gallery</string>
     <string id="MainMenuTitle">Bowling</string>
     <string id="StartNewGame">Start New Game</string>
     <string id="ViewGames">View Games</string>

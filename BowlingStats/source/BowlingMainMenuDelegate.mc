@@ -1,7 +1,7 @@
 import Toybox.WatchUi;
 import Toybox.Lang;
 
-class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
+class BowlingMainMenuDelegate extends WatchUi.Menu2InputDelegate {
     var _activeGame;
 
     public function initialize() {
@@ -13,7 +13,7 @@ class BowlingMainMenu2Delegate extends WatchUi.Menu2InputDelegate {
         var id = item.getId() as String;
 
         if(id.equals("newgame")) {
-            var game = new Game();
+            var game = new BowlingGame();
             _activeGame = game;
             var view = new SimpleEntryView(game, method(:onGameComplete), method(:onDiscardUnsavedGame));
             var theDelegate = new SimpleEntryDelegate(game, method(:onGameComplete));

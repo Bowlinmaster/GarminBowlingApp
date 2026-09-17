@@ -1,4 +1,4 @@
-# BowlingStats Roadmap
+# Bowling Stats Roadmap
 
 ## Completed
 

@@ -1,6 +1,6 @@
 # Device Support
 
-BowlingStats uses explicit device profiles because watches with similar dimensions can still differ in usable screen area, fonts, input controls, and button hints. This document defines what the project means by device support and tracks the current compatibility baseline.
+Bowling Stats uses explicit device profiles because watches with similar dimensions can still differ in usable screen area, fonts, input controls, and button hints. This document defines what the project means by device support and tracks the current compatibility baseline.
 
 ## Support Levels
 
@@ -28,8 +28,8 @@ An unknown product may receive a screen-size fallback profile. A fallback render
 
 ## Current Build Baseline
 
-- SDK: Connect IQ 9.1.0
-- Checked: 2026-09-12
+- SDK: Connect IQ 9.2.0
+- Checked: 2026-09-16
 - Result: full release package passed all 52 SDK-expanded builds for the 37 manifest product IDs
 - Visual baselines checked: 2026-09-14
 - Visual baseline result: all nine scenarios captured for all nine representative screen families

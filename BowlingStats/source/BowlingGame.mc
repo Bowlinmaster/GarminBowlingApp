@@ -478,9 +478,3 @@ class BowlingGame {
         return null;
     }
 }
-
-class Game extends BowlingGame {
-    function initialize() {
-        BowlingGame.initialize();
-    }
-}

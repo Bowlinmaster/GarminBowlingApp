@@ -1,4 +1,4 @@
-# Contributing to BowlingStats
+# Contributing to Bowling Stats
 
 ## Device Support
 

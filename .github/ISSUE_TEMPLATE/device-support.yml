@@ -6,7 +6,7 @@ labels:
 body:
   - type: markdown
     attributes:
-      value: Thanks for helping improve BowlingStats device support. Please provide the details below.
+      value: Thanks for helping improve Bowling Stats device support. Please provide the details below.
   - type: input
     id: model
     attributes:
@@ -23,7 +23,7 @@ body:
   - type: input
     id: app-version
     attributes:
-      label: BowlingStats version
+      label: Bowling Stats version
     validations:
       required: true
   - type: dropdown
