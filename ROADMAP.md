@@ -29,21 +29,13 @@
 ## Remaining
 
 9. Evaluate secondary device families.
-16. Correct cross-device layout defects found in the initial visual baselines:
-   - Keep potential and final scores above the scorecard's bottom border on the
-     360x360, 390x390, 416x416, 454x454, and 320x360 profiles.
-   - Vertically contain frame numbers and roll symbols within the scorecard
-     header and roll areas, especially on the 320x360 rectangular profile.
-   - Resize the saved-game detail grid rows or typography so frame numbers,
-     rolls, and cumulative scores do not cross separators on the AMOLED and
-     rectangular profiles.
-   - Keep Saved Games titles, detail headers, and page indicators inside the
-     physical and recommended content boundaries on round displays.
-   - Separate the saved-game date and score columns on the 320x360 rectangular
-     profile so their text cannot overlap.
 
 ## Future Features
 
 - Add pin-specific entry using pin masks.
 - Evaluate a `ByteArray` storage migration if measurements justify it.
+- Investigate compile-time device-specific layouts using resource qualifiers and
+  Jungle-selected source profiles. Compare executable size, runtime heap, and
+  graphics-pool usage with the current runtime profile system while retaining
+  primitive drawing for dynamic scorecards where it remains more efficient.
 - Separate paid and free features if a paid version is pursued.
