@@ -25,14 +25,42 @@
    - Expand tenth-frame and storage edge-case tests.
    - Validate application metadata and release packaging.
 15. Add a saved-game summary list and detail flow.
+16. Add bowling statistics:
+   - Define per-game first-ball average, strike rate, spare-conversion rate,
+     open frames, clean frames, and final-score metrics.
+   - Maintain compact lifetime aggregates without enlarging individual saved
+     game records or rescanning game history during normal use.
+   - Group games completed within the same two-hour session into series and
+     track series count, average series, high series, and average games per
+     series.
+   - Add aggregate and per-game statistics pages to the saved-games flow.
+   - Version and migrate existing stored games.
 
 ## Remaining
 
 9. Evaluate secondary device families.
+17. Implement Pin Entry mode:
+   - Represent standing and knocked-down pins with ten-bit masks while keeping
+     the scoring engine independent of the entry method.
+   - Add a pin-deck entry screen where touch users can toggle the pins left
+     standing after each roll.
+   - Provide an ergonomic button-only interaction for supported devices that do
+     not have touchscreens.
+   - Validate legal pin transitions, derive the roll score from the masks, and
+     show the same score preview and confirmation feedback as Simple Entry.
+   - Extend saved-game encoding and migrations to retain pin-level history only
+     for games that use it.
+18. Expand support to additional compatible Garmin devices:
+   - Inventory Connect IQ watch-app products and exclude devices whose screen,
+     input, API level, or memory limits cannot provide a usable experience.
+   - Add explicit layout profiles and resource overrides where needed.
+   - Require successful packaging, input checks, and representative visual
+     baselines before adding each product to the manifest.
+   - Track physical-device confirmation separately and use GitHub issues for
+     support requests when hardware is unavailable locally.
 
 ## Future Features
 
-- Add pin-specific entry using pin masks.
 - Evaluate a `ByteArray` storage migration if measurements justify it.
 - Investigate compile-time device-specific layouts using resource qualifiers and
   Jungle-selected source profiles. Compare executable size, runtime heap, and

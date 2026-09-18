@@ -13,26 +13,26 @@ class SavedGamesListView extends WatchUi.View {
     function initialize() {
         WatchUi.View.initialize();
         _gameCount = BowlingSavedGameStore.getSavedGameCount();
-        _selectedIndex = 0;
+        _selectedIndex = _gameCount > 0 ? 1 : 0;
     }
 
     function nextGame() {
-        if (_gameCount <= 1) {
+        if (_gameCount == 0) {
             return;
         }
 
-        _selectedIndex = (_selectedIndex + 1) % _gameCount;
+        _selectedIndex = (_selectedIndex + 1) % (_gameCount + 1);
         WatchUi.requestUpdate();
     }
 
     function previousGame() {
-        if (_gameCount <= 1) {
+        if (_gameCount == 0) {
             return;
         }
 
         _selectedIndex -= 1;
         if (_selectedIndex < 0) {
-            _selectedIndex = _gameCount - 1;
+            _selectedIndex = _gameCount;
         }
 
         WatchUi.requestUpdate();
@@ -43,16 +43,22 @@ class SavedGamesListView extends WatchUi.View {
             return;
         }
 
-        var detail = new SavedGameDetailView(_selectedIndex);
-        WatchUi.pushView(detail, new SavedGameDetailDelegate(), WatchUi.SLIDE_IMMEDIATE);
+        if (_selectedIndex == 0) {
+            var statisticsView = new BowlingStatisticsView(BowlingSavedGameStore.getAggregateStatistics());
+            WatchUi.pushView(statisticsView, new BowlingStatisticsDelegate(statisticsView), WatchUi.SLIDE_IMMEDIATE);
+            return;
+        }
+
+        var detail = new SavedGameDetailView(_selectedIndex - 1);
+        WatchUi.pushView(detail, new SavedGameDetailDelegate(detail), WatchUi.SLIDE_IMMEDIATE);
     }
 
     function onShow() {
         _gameCount = BowlingSavedGameStore.getSavedGameCount();
         if (_gameCount == 0) {
             _selectedIndex = 0;
-        } else if (_selectedIndex >= _gameCount) {
-            _selectedIndex = _gameCount - 1;
+        } else if (_selectedIndex > _gameCount) {
+            _selectedIndex = _gameCount;
         }
     }
 
@@ -86,7 +92,7 @@ class SavedGamesListView extends WatchUi.View {
         drawRows(dc, width, height);
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        var positionText = (_selectedIndex + 1).toString() + "/" + _gameCount.toString();
+        var positionText = (_selectedIndex + 1).toString() + "/" + (_gameCount + 1).toString();
         var positionY = BowlingScreenGeometry.fitBottomCenteredTextY(
             dc,
             width,
@@ -111,20 +117,70 @@ class SavedGamesListView extends WatchUi.View {
 
         for (var row = 0; row < VISIBLE_ROW_COUNT; row++) {
             var index = firstIndex + row;
-            if (index < 0 || index >= _gameCount) {
+            if (index < 0 || index > _gameCount) {
                 continue;
             }
 
-            var summary = BowlingSavedGameStore.getSavedGameSummary(index) as Lang.Dictionary?;
-            if (summary != null) {
-                drawSummaryRow(dc, summary, index == _selectedIndex, width, top + (row * rowHeight), rowHeight);
+            if (index == 0) {
+                drawStatisticsRow(dc, index == _selectedIndex, width, top + (row * rowHeight), rowHeight);
+            } else {
+                var summary = BowlingSavedGameStore.getSavedGameSummary(index - 1) as Lang.Dictionary?;
+                if (summary != null) {
+                    drawSummaryRow(dc, summary, index == _selectedIndex, width, top + (row * rowHeight), rowHeight);
+                }
             }
         }
 
         _gameCount = BowlingSavedGameStore.getSavedGameCount();
     }
 
+    private function drawStatisticsRow(dc, isSelected, width, y, height) {
+        var bounds = getRowBounds(dc, width, y, height) as Array<Number>;
+        var left = bounds[0];
+        var right = bounds[1];
+
+        if (isSelected) {
+            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
+            dc.fillRectangle(left, y, right - left, height - 2);
+        }
+
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(
+            left + 8,
+            y + (height / 2),
+            Graphics.FONT_XTINY,
+            bowlingString(Rez.Strings.AllStatistics),
+            Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
+        );
+    }
+
     private function drawSummaryRow(dc, summary as Lang.Dictionary, isSelected, width, y, height) {
+        var bounds = getRowBounds(dc, width, y, height) as Array<Number>;
+        var left = bounds[0];
+        var right = bounds[1];
+
+        if (isSelected) {
+            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
+            dc.fillRectangle(left, y, right - left, height - 2);
+        }
+
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        var dateText = getSavedAtText(summary, false);
+        var scoreText = summary[BOWLING_SAVED_GAME_SCORE].toString();
+        var dateFont = Graphics.FONT_XTINY;
+        var scoreFont = Graphics.FONT_SMALL;
+        var availableWidth = right - left - 16;
+        var contentWidth = dc.getTextWidthInPixels(dateText, dateFont) +
+            dc.getTextWidthInPixels(scoreText, scoreFont) + 10;
+        if (contentWidth > availableWidth) {
+            dateText = getSavedAtText(summary, true);
+        }
+
+        dc.drawText(left + 8, y + (height / 2), dateFont, dateText, Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(right - 8, y + (height / 2), scoreFont, scoreText, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    private function getRowBounds(dc, width, y, height) as Array<Number> {
         var horizontalInset = width < 260 ? 18 : 28;
         var maximumWidth = width - (horizontalInset * 2);
         var safeWidth = BowlingScreenGeometry.getSafeWidthForBand(
@@ -140,26 +196,7 @@ class SavedGamesListView extends WatchUi.View {
 
         var left = (width - safeWidth) / 2;
         var right = left + safeWidth;
-
-        if (isSelected) {
-            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
-            dc.fillRectangle(left, y, right - left, height - 2);
-        }
-
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        var dateText = getSavedAtText(summary, false);
-        var scoreText = summary[BOWLING_SAVED_GAME_SCORE].toString();
-        var dateFont = Graphics.FONT_XTINY;
-        var scoreFont = Graphics.FONT_SMALL;
-        var availableWidth = safeWidth - 16;
-        var contentWidth = dc.getTextWidthInPixels(dateText, dateFont) +
-            dc.getTextWidthInPixels(scoreText, scoreFont) + 10;
-        if (contentWidth > availableWidth) {
-            dateText = getSavedAtText(summary, true);
-        }
-
-        dc.drawText(left + 8, y + (height / 2), dateFont, dateText, Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(right - 8, y + (height / 2), scoreFont, scoreText, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
+        return [left, right];
     }
 
     private function getSavedAtText(summary as Lang.Dictionary, compact) {

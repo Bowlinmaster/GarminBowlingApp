@@ -8,12 +8,24 @@ class SavedGameDetailView extends WatchUi.View {
     var _gameCount as Number;
     var _selectedIndex as Number;
     var _selectedGame as Lang.Dictionary or Null;
+    var _page as Number;
 
     function initialize(selectedIndex) {
         WatchUi.View.initialize();
         _gameCount = BowlingSavedGameStore.getSavedGameCount();
         _selectedIndex = selectedIndex;
+        _page = 0;
         loadSelectedGame();
+    }
+
+    function nextPage() as Void {
+        _page = (_page + 1) % 3;
+        WatchUi.requestUpdate();
+    }
+
+    function previousPage() as Void {
+        _page = (_page + 2) % 3;
+        WatchUi.requestUpdate();
     }
 
     function onUpdate(dc) {
@@ -31,6 +43,11 @@ class SavedGameDetailView extends WatchUi.View {
 
         var savedGame = _selectedGame as Lang.Dictionary;
         var game = savedGame[BOWLING_SAVED_GAME_MODEL] as BowlingGame;
+
+        if (_page > 0) {
+            BowlingStatisticsRenderer.draw(dc, BowlingStatistics.forGame(game), false, _page - 1, _page + 1, 3);
+            return;
+        }
 
         var scorecardTop = drawHeader(dc, savedGame, centerX, width, height);
         drawScorecard(dc, game, width, height, scorecardTop);
@@ -208,12 +225,8 @@ class SavedGameDetailView extends WatchUi.View {
     }
 
     private function drawPosition(dc, centerX, height) {
-        if (_gameCount <= 1) {
-            return;
-        }
-
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        var positionText = (_selectedIndex + 1).toString() + "/" + _gameCount.toString();
+        var positionText = "1/3";
         var preferredY = height - (height < 260 ? 20 : 28);
         var y = BowlingScreenGeometry.fitBottomCenteredTextY(
             dc,

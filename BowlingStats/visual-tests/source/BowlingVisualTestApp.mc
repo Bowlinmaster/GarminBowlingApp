@@ -37,8 +37,8 @@ class BowlingVisualGalleryView extends WatchUi.View {
         dc.clear();
 
         var cellWidth = _width / 3;
-        var cellHeight = _height / 3;
-        for (var index = 0; index < 9; index++) {
+        var cellHeight = _height / 5;
+        for (var index = 0; index < 14; index++) {
             var column = index % 3;
             var row = (index / 3).toNumber();
             var centerX = (column * cellWidth) + (cellWidth / 2);
@@ -68,6 +68,11 @@ class BowlingVisualTestMenuDelegate extends WatchUi.BehaviorDelegate {
         "empty-history",
         "saved-games",
         "game-detail",
+        "all-statistics",
+        "all-statistics-accuracy",
+        "all-statistics-series",
+        "game-statistics",
+        "game-statistics-accuracy",
         "discard-dialog"
     ];
 
@@ -124,7 +129,34 @@ class BowlingVisualTestMenuDelegate extends WatchUi.BehaviorDelegate {
             WatchUi.pushView(listView, new SavedGamesListDelegate(listView), WatchUi.SLIDE_IMMEDIATE);
         } else if (id.equals("game-detail")) {
             seedSavedGames();
-            WatchUi.pushView(new SavedGameDetailView(0), new SavedGameDetailDelegate(), WatchUi.SLIDE_IMMEDIATE);
+            var detailView = new SavedGameDetailView(0);
+            WatchUi.pushView(detailView, new SavedGameDetailDelegate(detailView), WatchUi.SLIDE_IMMEDIATE);
+        } else if (id.equals("all-statistics")) {
+            seedSavedGames();
+            var statisticsView = new BowlingStatisticsView(BowlingSavedGameStore.getAggregateStatistics());
+            WatchUi.pushView(statisticsView, new BowlingStatisticsDelegate(statisticsView), WatchUi.SLIDE_IMMEDIATE);
+        } else if (id.equals("all-statistics-accuracy")) {
+            seedSavedGames();
+            var accuracyView = new BowlingStatisticsView(BowlingSavedGameStore.getAggregateStatistics());
+            accuracyView.nextPage();
+            WatchUi.pushView(accuracyView, new BowlingStatisticsDelegate(accuracyView), WatchUi.SLIDE_IMMEDIATE);
+        } else if (id.equals("all-statistics-series")) {
+            seedSavedGames();
+            var seriesView = new BowlingStatisticsView(BowlingSavedGameStore.getAggregateStatistics());
+            seriesView.nextPage();
+            seriesView.nextPage();
+            WatchUi.pushView(seriesView, new BowlingStatisticsDelegate(seriesView), WatchUi.SLIDE_IMMEDIATE);
+        } else if (id.equals("game-statistics")) {
+            seedSavedGames();
+            var gameStatisticsView = new SavedGameDetailView(0);
+            gameStatisticsView.nextPage();
+            WatchUi.pushView(gameStatisticsView, new SavedGameDetailDelegate(gameStatisticsView), WatchUi.SLIDE_IMMEDIATE);
+        } else if (id.equals("game-statistics-accuracy")) {
+            seedSavedGames();
+            var gameAccuracyView = new SavedGameDetailView(0);
+            gameAccuracyView.nextPage();
+            gameAccuracyView.nextPage();
+            WatchUi.pushView(gameAccuracyView, new SavedGameDetailDelegate(gameAccuracyView), WatchUi.SLIDE_IMMEDIATE);
         } else if (id.equals("discard-dialog")) {
             var confirmation = new WatchUi.Confirmation(bowlingString(Rez.Strings.DiscardCurrentGameConfirmation));
             WatchUi.pushView(confirmation, new BowlingVisualTestConfirmationDelegate(), WatchUi.SLIDE_IMMEDIATE);
@@ -191,8 +223,8 @@ class BowlingVisualTestMenuDelegate extends WatchUi.BehaviorDelegate {
     private function seedSavedGames() as Void {
         BowlingSavedGameStore.clearSavedGames();
         BowlingSavedGameStore.saveGameAt(buildGutterGame(), 1767225600);
-        BowlingSavedGameStore.saveGameAt(buildAllFivesGame(), 1767312000);
-        BowlingSavedGameStore.saveGameAt(buildPerfectGame(), 1767398400);
+        BowlingSavedGameStore.saveGameAt(buildAllFivesGame(), 1767227400);
+        BowlingSavedGameStore.saveGameAt(buildPerfectGame(), 1767229200);
     }
 }
 

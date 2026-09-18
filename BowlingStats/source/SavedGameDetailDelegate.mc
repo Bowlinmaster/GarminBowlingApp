@@ -1,8 +1,26 @@
 import Toybox.WatchUi;
 
 class SavedGameDetailDelegate extends WatchUi.BehaviorDelegate {
-    function initialize() {
+    private var _view;
+
+    function initialize(view) {
         WatchUi.BehaviorDelegate.initialize();
+        _view = view;
+    }
+
+    function onNextPage() {
+        _view.nextPage();
+        return true;
+    }
+
+    function onPreviousPage() {
+        _view.previousPage();
+        return true;
+    }
+
+    function onSelect() {
+        _view.nextPage();
+        return true;
     }
 
     function onBack() {

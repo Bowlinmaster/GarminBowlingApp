@@ -21,6 +21,11 @@
     { "id": "empty-history", "label": "Empty saved-game history" },
     { "id": "saved-games", "label": "Saved-game list" },
     { "id": "game-detail", "label": "Saved-game detail" },
+    { "id": "all-statistics", "label": "All-game statistics" },
+    { "id": "all-statistics-accuracy", "label": "All-game accuracy statistics" },
+    { "id": "all-statistics-series", "label": "All-game series statistics" },
+    { "id": "game-statistics", "label": "Single-game statistics" },
+    { "id": "game-statistics-accuracy", "label": "Single-game accuracy statistics" },
     { "id": "discard-dialog", "label": "Discard confirmation" }
   ]
 }

@@ -3,12 +3,17 @@ import Toybox.Lang;
 import Toybox.Time;
 
 const BOWLING_SAVED_GAMES_STORAGE_KEY = "games.v2";
-const BOWLING_SAVED_GAMES_FORMAT_VERSION = 2;
-const BOWLING_SAVED_GAMES_HEADER_SIZE = 2;
+const BOWLING_SAVED_GAMES_FORMAT_VERSION = 4;
+const BOWLING_SAVED_GAMES_PREVIOUS_FORMAT_VERSION = 3;
+const BOWLING_SAVED_GAMES_LEGACY_FORMAT_VERSION = 2;
+const BOWLING_SAVED_GAMES_LEGACY_HEADER_SIZE = 2;
+const BOWLING_SAVED_GAMES_PREVIOUS_HEADER_SIZE = 10;
+const BOWLING_SAVED_GAMES_HEADER_SIZE = 14;
 const BOWLING_SAVED_GAME_RECORD_SIZE = 6;
 const BOWLING_SAVED_GAMES_MAX_COUNT = 100;
 const BOWLING_SAVED_GAME_PIN_GROUP_SIZE = 7;
 const BOWLING_SAVED_GAME_PIN_GROUP_COUNT = 3;
+const BOWLING_SAVED_GAME_SERIES_GAP_SECONDS = 7200;
 
 const BOWLING_SAVED_GAME_SAVED_AT = "t";
 const BOWLING_SAVED_GAME_SCORE = "s";
@@ -16,9 +21,23 @@ const BOWLING_SAVED_GAME_ROLL_COUNT = "n";
 const BOWLING_SAVED_GAME_PIN_COUNTS = "p";
 const BOWLING_SAVED_GAME_MODEL = "g";
 
+const BOWLING_SAVED_GAMES_COUNT_INDEX = 1;
+const BOWLING_SAVED_GAMES_LIFETIME_COUNT_INDEX = 2;
+const BOWLING_SAVED_GAMES_TOTAL_SCORE_INDEX = 3;
+const BOWLING_SAVED_GAMES_HIGH_SCORE_INDEX = 4;
+const BOWLING_SAVED_GAMES_FIRST_BALL_PINS_INDEX = 5;
+const BOWLING_SAVED_GAMES_STRIKES_INDEX = 6;
+const BOWLING_SAVED_GAMES_SPARE_ATTEMPTS_INDEX = 7;
+const BOWLING_SAVED_GAMES_SPARES_INDEX = 8;
+const BOWLING_SAVED_GAMES_OPEN_FRAMES_INDEX = 9;
+const BOWLING_SAVED_GAMES_SERIES_COUNT_INDEX = 10;
+const BOWLING_SAVED_GAMES_HIGH_SERIES_INDEX = 11;
+const BOWLING_SAVED_GAMES_ACTIVE_SERIES_SCORE_INDEX = 12;
+const BOWLING_SAVED_GAMES_ACTIVE_SERIES_GAMES_INDEX = 13;
+
 class BowlingSavedGameStore {
-    // Store layout: [version, count], then newest-first fixed records.
-    // Each record is savedAt, score, rollCount, and three packed pin-count fields.
+    // The header keeps lifetime totals and current-series state in fixed integer fields. Game records
+    // remain six values each: savedAt, score, rollCount, and three packed rolls.
     static function saveGame(game as BowlingGame) as Boolean {
         return saveGameAt(game, Time.now().value());
     }
@@ -36,9 +55,10 @@ class BowlingSavedGameStore {
                 recordsToKeep = BOWLING_SAVED_GAMES_MAX_COUNT - 1;
             }
 
-            var updated = [];
-            updated.add(BOWLING_SAVED_GAMES_FORMAT_VERSION);
-            updated.add(recordsToKeep + 1);
+            var updated = existing.slice(0, BOWLING_SAVED_GAMES_HEADER_SIZE) as Lang.Array;
+            updated[BOWLING_SAVED_GAMES_COUNT_INDEX] = recordsToKeep + 1;
+            addStatisticsToHeader(updated, BowlingStatistics.forGame(game));
+            addGameToSeriesHeader(updated, game.getScore(), savedAtSeconds, getNewestSavedAt(existing));
             updated.addAll(buildRecord(game, savedAtSeconds));
 
             if (recordsToKeep > 0) {
@@ -113,6 +133,26 @@ class BowlingSavedGameStore {
 
     static function getSavedGameCount() as Number {
         return getStoredCount(getStoredValues());
+    }
+
+    static function getAggregateStatistics() as Lang.Dictionary {
+        var values = getStoredValues();
+        var gameCount = values[BOWLING_SAVED_GAMES_LIFETIME_COUNT_INDEX] as Number;
+
+        return {
+            BOWLING_STAT_GAME_COUNT => gameCount,
+            BOWLING_STAT_TOTAL_SCORE => values[BOWLING_SAVED_GAMES_TOTAL_SCORE_INDEX],
+            BOWLING_STAT_HIGH_SCORE => values[BOWLING_SAVED_GAMES_HIGH_SCORE_INDEX],
+            BOWLING_STAT_FIRST_BALL_PINS => values[BOWLING_SAVED_GAMES_FIRST_BALL_PINS_INDEX],
+            BOWLING_STAT_FIRST_BALL_ATTEMPTS => gameCount * 10,
+            BOWLING_STAT_STRIKES => values[BOWLING_SAVED_GAMES_STRIKES_INDEX],
+            BOWLING_STAT_STRIKE_ATTEMPTS => gameCount * 10,
+            BOWLING_STAT_SPARE_ATTEMPTS => values[BOWLING_SAVED_GAMES_SPARE_ATTEMPTS_INDEX],
+            BOWLING_STAT_SPARES => values[BOWLING_SAVED_GAMES_SPARES_INDEX],
+            BOWLING_STAT_OPEN_FRAMES => values[BOWLING_SAVED_GAMES_OPEN_FRAMES_INDEX],
+            BOWLING_STAT_SERIES_COUNT => values[BOWLING_SAVED_GAMES_SERIES_COUNT_INDEX],
+            BOWLING_STAT_HIGH_SERIES => values[BOWLING_SAVED_GAMES_HIGH_SERIES_INDEX]
+        };
     }
 
     static function clearSavedGames() as Void {
@@ -194,9 +234,26 @@ class BowlingSavedGameStore {
     private static function getStoredValues() as Lang.Array {
         try {
             var values = Application.Storage.getValue(BOWLING_SAVED_GAMES_STORAGE_KEY);
-            if (!(values instanceof Lang.Array) || values.size() < BOWLING_SAVED_GAMES_HEADER_SIZE ||
-                !(values[0] instanceof Number) || values[0] != BOWLING_SAVED_GAMES_FORMAT_VERSION) {
+            if (!(values instanceof Lang.Array) || values.size() < BOWLING_SAVED_GAMES_LEGACY_HEADER_SIZE ||
+                !(values[0] instanceof Number)) {
                 return emptyStore();
+            }
+
+            if (values[0] == BOWLING_SAVED_GAMES_LEGACY_FORMAT_VERSION) {
+                return rebuildStore(values, BOWLING_SAVED_GAMES_LEGACY_HEADER_SIZE);
+            }
+
+            if (values[0] == BOWLING_SAVED_GAMES_PREVIOUS_FORMAT_VERSION) {
+                return rebuildStore(values, BOWLING_SAVED_GAMES_PREVIOUS_HEADER_SIZE);
+            }
+
+            if (values[0] != BOWLING_SAVED_GAMES_FORMAT_VERSION ||
+                values.size() < BOWLING_SAVED_GAMES_HEADER_SIZE) {
+                return emptyStore();
+            }
+
+            if (!hasValidHeader(values)) {
+                return rebuildStore(values, BOWLING_SAVED_GAMES_HEADER_SIZE);
             }
 
             return values;
@@ -206,11 +263,11 @@ class BowlingSavedGameStore {
     }
 
     private static function emptyStore() as Lang.Array {
-        return [BOWLING_SAVED_GAMES_FORMAT_VERSION, 0];
+        return [BOWLING_SAVED_GAMES_FORMAT_VERSION, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     }
 
     private static function getStoredCount(values as Lang.Array) as Number {
-        var count = values[1];
+        var count = values[BOWLING_SAVED_GAMES_COUNT_INDEX];
         if (!(count instanceof Number) || count < 0) {
             return 0;
         }
@@ -231,7 +288,8 @@ class BowlingSavedGameStore {
         try {
             var offset = BOWLING_SAVED_GAMES_HEADER_SIZE + (index * BOWLING_SAVED_GAME_RECORD_SIZE);
             var end = BOWLING_SAVED_GAMES_HEADER_SIZE + (count * BOWLING_SAVED_GAME_RECORD_SIZE);
-            var updated = [BOWLING_SAVED_GAMES_FORMAT_VERSION, count - 1];
+            var updated = values.slice(0, BOWLING_SAVED_GAMES_HEADER_SIZE) as Lang.Array;
+            updated[BOWLING_SAVED_GAMES_COUNT_INDEX] = count - 1;
 
             if (offset > BOWLING_SAVED_GAMES_HEADER_SIZE) {
                 updated.addAll(values.slice(BOWLING_SAVED_GAMES_HEADER_SIZE, offset));
@@ -245,6 +303,129 @@ class BowlingSavedGameStore {
             return true;
         } catch (ex) {
             return false;
+        }
+    }
+
+    private static function hasValidHeader(values as Lang.Array) as Boolean {
+        for (var index = BOWLING_SAVED_GAMES_COUNT_INDEX; index < BOWLING_SAVED_GAMES_HEADER_SIZE; index++) {
+            if (!(values[index] instanceof Number) || values[index] < 0) {
+                return false;
+            }
+        }
+
+        var savedCount = values[BOWLING_SAVED_GAMES_COUNT_INDEX] as Number;
+        var gameCount = values[BOWLING_SAVED_GAMES_LIFETIME_COUNT_INDEX] as Number;
+        var totalScore = values[BOWLING_SAVED_GAMES_TOTAL_SCORE_INDEX] as Number;
+        var highScore = values[BOWLING_SAVED_GAMES_HIGH_SCORE_INDEX] as Number;
+        var firstBallPins = values[BOWLING_SAVED_GAMES_FIRST_BALL_PINS_INDEX] as Number;
+        var strikes = values[BOWLING_SAVED_GAMES_STRIKES_INDEX] as Number;
+        var spareAttempts = values[BOWLING_SAVED_GAMES_SPARE_ATTEMPTS_INDEX] as Number;
+        var spares = values[BOWLING_SAVED_GAMES_SPARES_INDEX] as Number;
+        var openFrames = values[BOWLING_SAVED_GAMES_OPEN_FRAMES_INDEX] as Number;
+        var seriesCount = values[BOWLING_SAVED_GAMES_SERIES_COUNT_INDEX] as Number;
+        var highSeries = values[BOWLING_SAVED_GAMES_HIGH_SERIES_INDEX] as Number;
+        var activeSeriesScore = values[BOWLING_SAVED_GAMES_ACTIVE_SERIES_SCORE_INDEX] as Number;
+        var activeSeriesGames = values[BOWLING_SAVED_GAMES_ACTIVE_SERIES_GAMES_INDEX] as Number;
+
+        return savedCount <= BOWLING_SAVED_GAMES_MAX_COUNT &&
+               savedCount <= gameCount &&
+               totalScore <= gameCount * 300 &&
+               highScore <= 300 &&
+               firstBallPins <= gameCount * 100 &&
+               strikes <= gameCount * 10 &&
+               spareAttempts <= gameCount * 10 &&
+               spares <= spareAttempts &&
+               openFrames <= spareAttempts &&
+               strikes + spareAttempts == gameCount * 10 &&
+               spares + openFrames == spareAttempts &&
+               ((gameCount == 0 && seriesCount == 0 && activeSeriesGames == 0) ||
+                (gameCount > 0 && seriesCount > 0 && seriesCount <= gameCount && activeSeriesGames > 0 && activeSeriesGames <= gameCount)) &&
+               activeSeriesScore <= activeSeriesGames * 300 &&
+               highSeries >= activeSeriesScore;
+    }
+
+    private static function rebuildStore(values as Lang.Array, sourceHeaderSize as Number) as Lang.Array {
+        var rebuilt = emptyStore();
+        var declaredCount = values.size() > 1 && values[1] instanceof Number ? values[1] : 0;
+        var availableCount = (values.size() - sourceHeaderSize) / BOWLING_SAVED_GAME_RECORD_SIZE;
+        var count = declaredCount;
+        if (count < 0) {
+            count = 0;
+        }
+        if (count > availableCount) {
+            count = availableCount;
+        }
+        if (count > BOWLING_SAVED_GAMES_MAX_COUNT) {
+            count = BOWLING_SAVED_GAMES_MAX_COUNT;
+        }
+
+        for (var index = 0; index < count; index++) {
+            var offset = sourceHeaderSize + (index * BOWLING_SAVED_GAME_RECORD_SIZE);
+            var decoded = decodeRecord(values, offset);
+            if (decoded == null) {
+                continue;
+            }
+
+            rebuilt[BOWLING_SAVED_GAMES_COUNT_INDEX] += 1;
+            addStatisticsToHeader(rebuilt, BowlingStatistics.forGame(decoded[BOWLING_SAVED_GAME_MODEL] as BowlingGame));
+            rebuilt.addAll(values.slice(offset, offset + BOWLING_SAVED_GAME_RECORD_SIZE));
+        }
+
+        rebuildSeriesHeader(rebuilt);
+
+        Application.Storage.setValue(BOWLING_SAVED_GAMES_STORAGE_KEY, rebuilt);
+        return rebuilt;
+    }
+
+    private static function addStatisticsToHeader(values as Lang.Array, statistics as Lang.Dictionary) as Void {
+        values[BOWLING_SAVED_GAMES_LIFETIME_COUNT_INDEX] += statistics[BOWLING_STAT_GAME_COUNT] as Number;
+        values[BOWLING_SAVED_GAMES_TOTAL_SCORE_INDEX] += statistics[BOWLING_STAT_TOTAL_SCORE] as Number;
+        var score = statistics[BOWLING_STAT_HIGH_SCORE] as Number;
+        if (score > values[BOWLING_SAVED_GAMES_HIGH_SCORE_INDEX]) {
+            values[BOWLING_SAVED_GAMES_HIGH_SCORE_INDEX] = score;
+        }
+        values[BOWLING_SAVED_GAMES_FIRST_BALL_PINS_INDEX] += statistics[BOWLING_STAT_FIRST_BALL_PINS] as Number;
+        values[BOWLING_SAVED_GAMES_STRIKES_INDEX] += statistics[BOWLING_STAT_STRIKES] as Number;
+        values[BOWLING_SAVED_GAMES_SPARE_ATTEMPTS_INDEX] += statistics[BOWLING_STAT_SPARE_ATTEMPTS] as Number;
+        values[BOWLING_SAVED_GAMES_SPARES_INDEX] += statistics[BOWLING_STAT_SPARES] as Number;
+        values[BOWLING_SAVED_GAMES_OPEN_FRAMES_INDEX] += statistics[BOWLING_STAT_OPEN_FRAMES] as Number;
+    }
+
+    private static function getNewestSavedAt(values as Lang.Array) as Number or Null {
+        if (getStoredCount(values) == 0) {
+            return null;
+        }
+
+        var savedAt = values[BOWLING_SAVED_GAMES_HEADER_SIZE];
+        return isValidTimestamp(savedAt) ? savedAt : null;
+    }
+
+    private static function addGameToSeriesHeader(values as Lang.Array, score as Number, savedAt as Number, previousSavedAt as Number or Null) as Void {
+        var sameSeries = previousSavedAt != null && savedAt >= previousSavedAt &&
+            savedAt - previousSavedAt <= BOWLING_SAVED_GAME_SERIES_GAP_SECONDS;
+
+        if (sameSeries) {
+            values[BOWLING_SAVED_GAMES_ACTIVE_SERIES_SCORE_INDEX] += score;
+            values[BOWLING_SAVED_GAMES_ACTIVE_SERIES_GAMES_INDEX] += 1;
+        } else {
+            values[BOWLING_SAVED_GAMES_SERIES_COUNT_INDEX] += 1;
+            values[BOWLING_SAVED_GAMES_ACTIVE_SERIES_SCORE_INDEX] = score;
+            values[BOWLING_SAVED_GAMES_ACTIVE_SERIES_GAMES_INDEX] = 1;
+        }
+
+        if (values[BOWLING_SAVED_GAMES_ACTIVE_SERIES_SCORE_INDEX] > values[BOWLING_SAVED_GAMES_HIGH_SERIES_INDEX]) {
+            values[BOWLING_SAVED_GAMES_HIGH_SERIES_INDEX] = values[BOWLING_SAVED_GAMES_ACTIVE_SERIES_SCORE_INDEX];
+        }
+    }
+
+    private static function rebuildSeriesHeader(values as Lang.Array) as Void {
+        var previousSavedAt = null;
+        for (var index = getStoredCount(values) - 1; index >= 0; index--) {
+            var offset = BOWLING_SAVED_GAMES_HEADER_SIZE + (index * BOWLING_SAVED_GAME_RECORD_SIZE);
+            var savedAt = values[offset] as Number;
+            var score = values[offset + 1] as Number;
+            addGameToSeriesHeader(values, score, savedAt, previousSavedAt);
+            previousSavedAt = savedAt;
         }
     }
 

@@ -38,7 +38,7 @@ normal capture directory or compare against baselines, use:
 ```
 
 The automation uses Garmin's own **Save Screen Capture** command. The gallery's
-development-only 3-by-3 scenario grid provides deterministic button and touch
+development-only 3-by-5 scenario grid provides deterministic button and touch
 navigation; it is not included in production builds or baseline screenshots.
 
 ## Manual Launch
