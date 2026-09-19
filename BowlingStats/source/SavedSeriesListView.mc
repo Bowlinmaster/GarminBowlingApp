@@ -127,7 +127,7 @@ class SavedSeriesListView extends WatchUi.View {
         var centerX = (left + right) / 2;
         dc.drawText(centerX, y + (height / 4), Graphics.FONT_XTINY, dateText, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(centerX, y + ((height * 3) / 4), Graphics.FONT_XTINY, countText, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(centerX, y + ((height * 3) / 4) - 2, Graphics.FONT_XTINY, countText, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
     private function getRowBounds(dc as Dc, width as Number, y as Number, height as Number) as Array<Number> {

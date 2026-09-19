@@ -19,6 +19,20 @@ class BowlingStatisticsDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
+    function onKey(event as WatchUi.KeyEvent) as Boolean {
+        var key = event.getKey();
+        if (key == WatchUi.KEY_UP) {
+            _view.previousPage();
+            return true;
+        }
+        if (key == WatchUi.KEY_DOWN) {
+            _view.nextPage();
+            return true;
+        }
+
+        return false;
+    }
+
     function onSelect() as Boolean {
         _view.nextPage();
         return true;

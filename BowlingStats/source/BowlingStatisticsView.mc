@@ -239,6 +239,10 @@ class BowlingStatisticsRenderer {
 
             var left = (width - safeWidth) / 2;
             var right = left + safeWidth;
+            if (labels[index].equals(bowlingString(Rez.Strings.CleanFrameRate))) {
+                left -= 6;
+                right += 6;
+            }
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
             dc.drawText(left, centerY, Graphics.FONT_XTINY, labels[index], Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);

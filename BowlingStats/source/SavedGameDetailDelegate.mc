@@ -18,6 +18,20 @@ class SavedGameDetailDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
+    function onKey(event) {
+        var key = event.getKey();
+        if (key == WatchUi.KEY_UP) {
+            _view.previousPage();
+            return true;
+        }
+        if (key == WatchUi.KEY_DOWN) {
+            _view.nextPage();
+            return true;
+        }
+
+        return false;
+    }
+
     function onSelect() {
         _view.nextPage();
         return true;
