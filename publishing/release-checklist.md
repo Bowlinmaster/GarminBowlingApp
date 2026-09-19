@@ -31,4 +31,4 @@
 - [ ] Preview the unpublished listing on desktop and mobile.
 - [ ] Install the uploaded preview build on a physical watch.
 - [ ] Submit the application for Garmin review.
-- [ ] Tag the released commit, for example `v1.0.0`.
+- [ ] Tag the released commit using the Store version, for example `vX.Y.Z`.
