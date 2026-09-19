@@ -35,6 +35,16 @@
      series.
    - Add aggregate and per-game statistics pages to the saved-games flow.
    - Version and migrate existing stored games.
+19. Refine game-history and statistics reporting:
+   - Split View Games into all-statistics, series, and individual-game flows.
+   - Let users select a series by its start time, then view series-wide
+     statistics or any game in chronological order.
+   - Report average, high/low game, first-ball average, strike rate,
+     spare-conversion rate, single-pin and multi-pin spare rates, clean-frame
+     rate, and open frames at the appropriate scope.
+   - Show both percentages and made/attempt counts for conversion statistics.
+   - Keep lifetime reads constant-time and calculate selected-series metrics
+     directly from compact packed rolls.
 
 ## Remaining
 
@@ -58,7 +68,6 @@
      baselines before adding each product to the manifest.
    - Track physical-device confirmation separately and use GitHub issues for
      support requests when hardware is unavailable locally.
-
 ## Future Features
 
 - Evaluate a `ByteArray` storage migration if measurements justify it.

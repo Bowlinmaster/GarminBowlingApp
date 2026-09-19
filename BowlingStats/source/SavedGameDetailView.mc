@@ -19,12 +19,12 @@ class SavedGameDetailView extends WatchUi.View {
     }
 
     function nextPage() as Void {
-        _page = (_page + 1) % 3;
+        _page = (_page + 1) % 5;
         WatchUi.requestUpdate();
     }
 
     function previousPage() as Void {
-        _page = (_page + 2) % 3;
+        _page = (_page + 4) % 5;
         WatchUi.requestUpdate();
     }
 
@@ -45,7 +45,15 @@ class SavedGameDetailView extends WatchUi.View {
         var game = savedGame[BOWLING_SAVED_GAME_MODEL] as BowlingGame;
 
         if (_page > 0) {
-            BowlingStatisticsRenderer.draw(dc, BowlingStatistics.forGame(game), false, _page - 1, _page + 1, 3);
+            BowlingStatisticsRenderer.draw(
+                dc,
+                BowlingStatistics.forGame(game),
+                false,
+                _page - 1,
+                _page + 1,
+                5,
+                bowlingString(Rez.Strings.GameStatistics)
+            );
             return;
         }
 
@@ -226,7 +234,7 @@ class SavedGameDetailView extends WatchUi.View {
 
     private function drawPosition(dc, centerX, height) {
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        var positionText = "1/3";
+        var positionText = "1/5";
         var preferredY = height - (height < 260 ? 20 : 28);
         var y = BowlingScreenGeometry.fitBottomCenteredTextY(
             dc,

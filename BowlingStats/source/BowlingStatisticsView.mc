@@ -5,30 +5,32 @@ import Toybox.WatchUi;
 class BowlingStatisticsView extends WatchUi.View {
     private var _statistics as Lang.Dictionary;
     private var _page as Number;
+    private var _title as String;
 
-    function initialize(statistics as Lang.Dictionary) {
+    function initialize(statistics as Lang.Dictionary, title as String) {
         WatchUi.View.initialize();
         _statistics = statistics;
+        _title = title;
         _page = 0;
     }
 
     function nextPage() as Void {
-        _page = (_page + 1) % 3;
+        _page = (_page + 1) % 4;
         WatchUi.requestUpdate();
     }
 
     function previousPage() as Void {
-        _page = (_page + 2) % 3;
+        _page = (_page + 3) % 4;
         WatchUi.requestUpdate();
     }
 
     function onUpdate(dc as Dc) as Void {
-        BowlingStatisticsRenderer.draw(dc, _statistics, true, _page, _page + 1, 3);
+        BowlingStatisticsRenderer.draw(dc, _statistics, true, _page, _page + 1, 4, _title);
     }
 }
 
 class BowlingStatisticsRenderer {
-    static function draw(dc as Dc, statistics as Lang.Dictionary, aggregate as Boolean, statisticsPage as Number, displayPage as Number, displayPageCount as Number) as Void {
+    static function draw(dc as Dc, statistics as Lang.Dictionary, aggregate as Boolean, statisticsPage as Number, displayPage as Number, displayPageCount as Number, title as String) as Void {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
         dc.clear();
 
@@ -36,7 +38,6 @@ class BowlingStatisticsRenderer {
         var height = dc.getHeight();
         var centerX = width / 2;
         var safeInset = BowlingScreenGeometry.getSafeInset(width, height);
-        var title = aggregate ? bowlingString(Rez.Strings.AllStatistics) : bowlingString(Rez.Strings.GameStatistics);
         var titleY = BowlingScreenGeometry.fitTopCenteredTextY(
             dc,
             width,
@@ -54,8 +55,10 @@ class BowlingStatisticsRenderer {
             drawSummaryPage(dc, statistics, aggregate, titleY);
         } else if (statisticsPage == 1) {
             drawAccuracyPage(dc, statistics, aggregate, titleY);
+        } else if (statisticsPage == 2) {
+            drawSparePage(dc, statistics, titleY);
         } else {
-            drawSeriesPage(dc, statistics, titleY);
+            drawCountPage(dc, statistics, titleY);
         }
 
         drawPagePosition(dc, displayPage, displayPageCount);
@@ -70,12 +73,14 @@ class BowlingStatisticsRenderer {
             labels = [
                 bowlingString(Rez.Strings.GamesPlayed),
                 bowlingString(Rez.Strings.AverageScore),
-                bowlingString(Rez.Strings.HighGame)
+                bowlingString(Rez.Strings.HighGame),
+                bowlingString(Rez.Strings.LowGame)
             ];
             values = [
                 games.toString(),
                 BowlingStatistics.formatAverage(statistics[BOWLING_STAT_TOTAL_SCORE] as Number, games),
-                (statistics[BOWLING_STAT_HIGH_SCORE] as Number).toString()
+                (statistics[BOWLING_STAT_HIGH_SCORE] as Number).toString(),
+                (statistics[BOWLING_STAT_LOW_SCORE] as Number).toString()
             ];
         } else {
             labels = [
@@ -96,7 +101,7 @@ class BowlingStatisticsRenderer {
             ];
         }
 
-        drawRows(dc, labels, values, titleY, 3);
+        drawRows(dc, labels, values, titleY, aggregate ? 4 : 3);
     }
 
     private static function drawAccuracyPage(dc as Dc, statistics as Lang.Dictionary, aggregate as Boolean, titleY as Number) as Void {
@@ -112,10 +117,10 @@ class BowlingStatisticsRenderer {
             statistics[BOWLING_STAT_SPARES] as Number,
             statistics[BOWLING_STAT_SPARE_ATTEMPTS] as Number
         );
-        var openFrames = statistics[BOWLING_STAT_OPEN_FRAMES] as Number;
-        var totalFrames = (statistics[BOWLING_STAT_GAME_COUNT] as Number) * 10;
-        var cleanRate = BowlingStatistics.formatPercent(totalFrames - openFrames, totalFrames);
-
+        var cleanRate = BowlingStatistics.formatPercent(
+            statistics[BOWLING_STAT_CLEAN_FRAMES] as Number,
+            (statistics[BOWLING_STAT_GAME_COUNT] as Number) * 10
+        );
         if (aggregate) {
             drawRows(
                 dc,
@@ -123,54 +128,92 @@ class BowlingStatisticsRenderer {
                     bowlingString(Rez.Strings.FirstBallAverage),
                     bowlingString(Rez.Strings.StrikeRate),
                     bowlingString(Rez.Strings.SpareConversion),
-                    bowlingString(Rez.Strings.OpenFrames),
                     bowlingString(Rez.Strings.CleanFrameRate)
                 ],
-                [firstBallAverage, strikeRate, spareRate, openFrames.toString(), cleanRate],
+                [firstBallAverage, strikeRate, spareRate, cleanRate],
                 titleY,
-                5
+                4
             );
         } else {
             drawRows(
                 dc,
                 [
-                    bowlingString(Rez.Strings.Spares),
-                    bowlingString(Rez.Strings.OpenFrames),
-                    bowlingString(Rez.Strings.CleanFrames)
+                    bowlingString(Rez.Strings.FirstBallAverage),
+                    bowlingString(Rez.Strings.StrikeRate),
+                    bowlingString(Rez.Strings.SpareConversion),
+                    bowlingString(Rez.Strings.CleanFrameRate)
                 ],
                 [
-                    BowlingStatistics.formatRatio(
-                        statistics[BOWLING_STAT_SPARES] as Number,
-                        statistics[BOWLING_STAT_SPARE_ATTEMPTS] as Number
-                    ),
-                    openFrames.toString(),
-                    (10 - openFrames).toString()
+                    firstBallAverage,
+                    strikeRate,
+                    spareRate,
+                    cleanRate
                 ],
                 titleY,
-                3
+                4
             );
         }
     }
 
-    private static function drawSeriesPage(dc as Dc, statistics as Lang.Dictionary, titleY as Number) as Void {
-        var games = statistics[BOWLING_STAT_GAME_COUNT] as Number;
-        var series = statistics[BOWLING_STAT_SERIES_COUNT] as Number;
+    private static function drawSparePage(dc as Dc, statistics as Lang.Dictionary, titleY as Number) as Void {
         drawRows(
             dc,
             [
-                bowlingString(Rez.Strings.SeriesPlayed),
-                bowlingString(Rez.Strings.AverageSeries),
-                bowlingString(Rez.Strings.HighSeries),
-                bowlingString(Rez.Strings.GamesPerSeries)
+                bowlingString(Rez.Strings.SinglePinSpare),
+                bowlingString(Rez.Strings.MultiPinSpare),
+                bowlingString(Rez.Strings.OpenFrames)
             ],
             [
-                series.toString(),
-                BowlingStatistics.formatAverage(statistics[BOWLING_STAT_TOTAL_SCORE] as Number, series),
-                (statistics[BOWLING_STAT_HIGH_SERIES] as Number).toString(),
-                BowlingStatistics.formatAverage(games, series)
+                BowlingStatistics.formatPercent(
+                    statistics[BOWLING_STAT_SINGLE_PIN_SPARES] as Number,
+                    statistics[BOWLING_STAT_SINGLE_PIN_ATTEMPTS] as Number
+                ),
+                BowlingStatistics.formatPercent(
+                    statistics[BOWLING_STAT_MULTI_PIN_SPARES] as Number,
+                    statistics[BOWLING_STAT_MULTI_PIN_ATTEMPTS] as Number
+                ),
+                (statistics[BOWLING_STAT_OPEN_FRAMES] as Number).toString()
             ],
             titleY,
-            4
+            3
+        );
+    }
+
+    private static function drawCountPage(dc as Dc, statistics as Lang.Dictionary, titleY as Number) as Void {
+        var games = statistics[BOWLING_STAT_GAME_COUNT] as Number;
+        drawRows(
+            dc,
+            [
+                bowlingString(Rez.Strings.Strikes),
+                bowlingString(Rez.Strings.Spares),
+                bowlingString(Rez.Strings.SinglePinSpare),
+                bowlingString(Rez.Strings.MultiPinSpare),
+                bowlingString(Rez.Strings.Clean)
+            ],
+            [
+                BowlingStatistics.formatRatio(
+                    statistics[BOWLING_STAT_STRIKES] as Number,
+                    statistics[BOWLING_STAT_STRIKE_ATTEMPTS] as Number
+                ),
+                BowlingStatistics.formatRatio(
+                    statistics[BOWLING_STAT_SPARES] as Number,
+                    statistics[BOWLING_STAT_SPARE_ATTEMPTS] as Number
+                ),
+                BowlingStatistics.formatRatio(
+                    statistics[BOWLING_STAT_SINGLE_PIN_SPARES] as Number,
+                    statistics[BOWLING_STAT_SINGLE_PIN_ATTEMPTS] as Number
+                ),
+                BowlingStatistics.formatRatio(
+                    statistics[BOWLING_STAT_MULTI_PIN_SPARES] as Number,
+                    statistics[BOWLING_STAT_MULTI_PIN_ATTEMPTS] as Number
+                ),
+                BowlingStatistics.formatRatio(
+                    statistics[BOWLING_STAT_CLEAN_FRAMES] as Number,
+                    games * 10
+                )
+            ],
+            titleY,
+            5
         );
     }
 

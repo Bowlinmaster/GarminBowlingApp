@@ -13,7 +13,7 @@ class SavedGamesListView extends WatchUi.View {
     function initialize() {
         WatchUi.View.initialize();
         _gameCount = BowlingSavedGameStore.getSavedGameCount();
-        _selectedIndex = _gameCount > 0 ? 1 : 0;
+        _selectedIndex = 0;
     }
 
     function nextGame() {
@@ -21,7 +21,7 @@ class SavedGamesListView extends WatchUi.View {
             return;
         }
 
-        _selectedIndex = (_selectedIndex + 1) % (_gameCount + 1);
+        _selectedIndex = (_selectedIndex + 1) % _gameCount;
         WatchUi.requestUpdate();
     }
 
@@ -32,7 +32,7 @@ class SavedGamesListView extends WatchUi.View {
 
         _selectedIndex -= 1;
         if (_selectedIndex < 0) {
-            _selectedIndex = _gameCount;
+            _selectedIndex = _gameCount - 1;
         }
 
         WatchUi.requestUpdate();
@@ -43,13 +43,7 @@ class SavedGamesListView extends WatchUi.View {
             return;
         }
 
-        if (_selectedIndex == 0) {
-            var statisticsView = new BowlingStatisticsView(BowlingSavedGameStore.getAggregateStatistics());
-            WatchUi.pushView(statisticsView, new BowlingStatisticsDelegate(statisticsView), WatchUi.SLIDE_IMMEDIATE);
-            return;
-        }
-
-        var detail = new SavedGameDetailView(_selectedIndex - 1);
+        var detail = new SavedGameDetailView(_selectedIndex);
         WatchUi.pushView(detail, new SavedGameDetailDelegate(detail), WatchUi.SLIDE_IMMEDIATE);
     }
 
@@ -57,8 +51,8 @@ class SavedGamesListView extends WatchUi.View {
         _gameCount = BowlingSavedGameStore.getSavedGameCount();
         if (_gameCount == 0) {
             _selectedIndex = 0;
-        } else if (_selectedIndex > _gameCount) {
-            _selectedIndex = _gameCount;
+        } else if (_selectedIndex >= _gameCount) {
+            _selectedIndex = _gameCount - 1;
         }
     }
 
@@ -92,7 +86,7 @@ class SavedGamesListView extends WatchUi.View {
         drawRows(dc, width, height);
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        var positionText = (_selectedIndex + 1).toString() + "/" + (_gameCount + 1).toString();
+        var positionText = (_selectedIndex + 1).toString() + "/" + _gameCount.toString();
         var positionY = BowlingScreenGeometry.fitBottomCenteredTextY(
             dc,
             width,
@@ -117,41 +111,17 @@ class SavedGamesListView extends WatchUi.View {
 
         for (var row = 0; row < VISIBLE_ROW_COUNT; row++) {
             var index = firstIndex + row;
-            if (index < 0 || index > _gameCount) {
+            if (index < 0 || index >= _gameCount) {
                 continue;
             }
 
-            if (index == 0) {
-                drawStatisticsRow(dc, index == _selectedIndex, width, top + (row * rowHeight), rowHeight);
-            } else {
-                var summary = BowlingSavedGameStore.getSavedGameSummary(index - 1) as Lang.Dictionary?;
-                if (summary != null) {
-                    drawSummaryRow(dc, summary, index == _selectedIndex, width, top + (row * rowHeight), rowHeight);
-                }
+            var summary = BowlingSavedGameStore.getSavedGameSummary(index) as Lang.Dictionary?;
+            if (summary != null) {
+                drawSummaryRow(dc, summary, index == _selectedIndex, width, top + (row * rowHeight), rowHeight);
             }
         }
 
         _gameCount = BowlingSavedGameStore.getSavedGameCount();
-    }
-
-    private function drawStatisticsRow(dc, isSelected, width, y, height) {
-        var bounds = getRowBounds(dc, width, y, height) as Array<Number>;
-        var left = bounds[0];
-        var right = bounds[1];
-
-        if (isSelected) {
-            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
-            dc.fillRectangle(left, y, right - left, height - 2);
-        }
-
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(
-            left + 8,
-            y + (height / 2),
-            Graphics.FONT_XTINY,
-            bowlingString(Rez.Strings.AllStatistics),
-            Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
-        );
     }
 
     private function drawSummaryRow(dc, summary as Lang.Dictionary, isSelected, width, y, height) {
