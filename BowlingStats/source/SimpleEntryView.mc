@@ -109,9 +109,7 @@ class SimpleEntryView extends WatchUi.View {
         var left = centerX - (cardWidth / 2);
         var top = layout.top;
         var bodyTop = top + headerHeight;
-        var rollBoxWidth = layout.rollBoxWidth;
         var rollBoxHeight = layout.rollBoxHeight;
-        var rollCenterY = bodyTop + (rollBoxHeight / 2);
         var frameNumber = _game.getCurrentFrameNumber();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
@@ -122,9 +120,9 @@ class SimpleEntryView extends WatchUi.View {
         var frame = _game.getFrame(frameNumber - 1);
         var pendingRollIndex = getPendingRollIndex(frame);
         if (frameNumber == 10) {
-            drawTenthFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout);
+            drawTenthFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, layout);
         } else {
-            drawStandardFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout);
+            drawStandardFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, layout);
         }
 
         var score = _game.getPotentialScoreForCurrentThrow(_selectedPins);
@@ -138,7 +136,11 @@ class SimpleEntryView extends WatchUi.View {
         drawCenteredText(dc, centerX, scoreAreaTop + (scoreAreaHeight / 2), layout.scoreFont, scoreText);
     }
 
-    private function drawStandardFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout) {
+    private function drawStandardFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, layout) {
+        var cardWidth = layout.cardWidth;
+        var rollBoxWidth = layout.rollBoxWidth;
+        var rollBoxHeight = layout.rollBoxHeight;
+        var rollCenterY = bodyTop + (rollBoxHeight / 2);
         var boxLeft = left + cardWidth - rollBoxWidth;
         dc.drawRectangle(boxLeft, bodyTop, rollBoxWidth, rollBoxHeight);
 
@@ -150,7 +152,11 @@ class SimpleEntryView extends WatchUi.View {
         }
     }
 
-    private function drawTenthFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, cardWidth, rollBoxWidth, rollBoxHeight, rollCenterY, layout) {
+    private function drawTenthFrameRolls(dc, frame, pendingRollIndex, left, bodyTop, layout) {
+        var cardWidth = layout.cardWidth;
+        var rollBoxWidth = layout.rollBoxWidth;
+        var rollBoxHeight = layout.rollBoxHeight;
+        var rollCenterY = bodyTop + (rollBoxHeight / 2);
         var firstBoxLeft = left + cardWidth - (rollBoxWidth * 2);
         var secondBoxLeft = firstBoxLeft + rollBoxWidth;
 

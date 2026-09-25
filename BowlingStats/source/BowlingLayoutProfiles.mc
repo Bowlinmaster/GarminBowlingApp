@@ -69,6 +69,130 @@ class BowlingEntryLayoutProfiles {
 
         // DeviceSettings gives us the runtime part number, so each supported product can
         // have its own profile even when several products share the same screen size.
+        if (matchesPart(partNumber, ["006-B4656-00"])) {
+            return approachS50();
+        }
+
+        if (matchesPart(partNumber, ["006-B4233-00"])) {
+            return approachS7042mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4234-00"])) {
+            return approachS7047mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B2187-00"])) {
+            return d2Air();
+        }
+
+        if (matchesPart(partNumber, ["006-B4125-00"])) {
+            return d2AirX10();
+        }
+
+        if (matchesPart(partNumber, ["006-B4079-00"])) {
+            return d2Mach1();
+        }
+
+        if (matchesPart(partNumber, ["006-B4879-00"])) {
+            return d2Mach2();
+        }
+
+        if (matchesPart(partNumber, ["006-B5056-00"])) {
+            return d2Mach2Pro();
+        }
+
+        if (matchesPart(partNumber, ["006-B4588-00"])) {
+            return descentG2();
+        }
+
+        if (matchesPart(partNumber, ["006-B4222-00"])) {
+            return descentMk343mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4223-00"])) {
+            return descentMk351mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B3943-00", "006-B3944-00"])) {
+            return epix2();
+        }
+
+        if (matchesPart(partNumber, ["006-B4312-00"])) {
+            return epix2Pro42mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4313-00"])) {
+            return epix2Pro47mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4314-00", "006-B4542-00", "006-B4556-00"])) {
+            return epix2Pro51mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4631-00"])) {
+            return fenix8Pro47mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4666-00"])) {
+            return fenixE();
+        }
+
+        if (matchesPart(partNumber, ["006-B5133-00"])) {
+            return fenix943mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B5134-00"])) {
+            return fenix947mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4952-00"])) {
+            return fenix9Pro43mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4953-00"])) {
+            return fenix9Pro47mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4815-00"])) {
+            return fr170();
+        }
+
+        if (matchesPart(partNumber, ["006-B4814-00"])) {
+            return fr170Music();
+        }
+
+        if (matchesPart(partNumber, ["006-B4916-00", "006-B5214-00"])) {
+            return fr70();
+        }
+
+        if (matchesPart(partNumber, ["006-B4586-00"])) {
+            return instinct3Amoled45mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4587-00"])) {
+            return instinct3Amoled50mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4678-00"])) {
+            return instinctCrossoverAmoled();
+        }
+
+        if (matchesPart(partNumber, ["006-B4105-00", "006-B4472-00"])) {
+            return marq2();
+        }
+
+        if (matchesPart(partNumber, ["006-B4124-00"])) {
+            return marq2Aviator();
+        }
+
+        if (matchesPart(partNumber, ["006-B3226-00", "006-B3389-00"])) {
+            return venu();
+        }
+
+        if (matchesPart(partNumber, ["006-B3740-00", "006-B3737-00"])) {
+            return venuMercedesBenz();
+        }
+
         if (matchesPart(partNumber, ["006-B3907-00", "006-B3910-00", "006-B4135-00", "006-B4341-00"])) {
             return fenix7x();
         }
@@ -334,6 +458,38 @@ class BowlingEntryLayoutProfiles {
     static function fenix843mm() {
         return profile416("fenix843mm");
     }
+
+    static function approachS50() { return profile390("approachs50"); }
+    static function approachS7042mm() { return profile390("approachs7042mm"); }
+    static function approachS7047mm() { return profile454("approachs7047mm"); }
+    static function d2Air() { return profile390("d2air"); }
+    static function d2AirX10() { return profile416("d2airx10"); }
+    static function d2Mach1() { return profile416("d2mach1"); }
+    static function d2Mach2() { return profile454("d2mach2"); }
+    static function d2Mach2Pro() { return profile454("d2mach2pro"); }
+    static function descentG2() { return profile390("descentg2"); }
+    static function descentMk343mm() { return profile390("descentmk343mm"); }
+    static function descentMk351mm() { return profile454("descentmk351mm"); }
+    static function epix2() { return profile416("epix2"); }
+    static function epix2Pro42mm() { return profile390("epix2pro42mm"); }
+    static function epix2Pro47mm() { return profile416("epix2pro47mm"); }
+    static function epix2Pro51mm() { return profile454("epix2pro51mm"); }
+    static function fenix8Pro47mm() { return profile454("fenix8pro47mm"); }
+    static function fenixE() { return profile416("fenixe"); }
+    static function fenix943mm() { return profile416("fenix943mm"); }
+    static function fenix947mm() { return profile454("fenix947mm"); }
+    static function fenix9Pro43mm() { return profile416("fenix9pro43mm"); }
+    static function fenix9Pro47mm() { return profile454("fenix9pro47mm"); }
+    static function fr170() { return profile390("fr170"); }
+    static function fr170Music() { return profile390("fr170m"); }
+    static function fr70() { return profile390("fr70"); }
+    static function instinct3Amoled45mm() { return profile390("instinct3amoled45mm"); }
+    static function instinct3Amoled50mm() { return profile416("instinct3amoled50mm"); }
+    static function instinctCrossoverAmoled() { return profile390("instinctcrossoveramoled"); }
+    static function marq2() { return profile390("marq2"); }
+    static function marq2Aviator() { return profile390("marq2aviator"); }
+    static function venu() { return profile390("venu"); }
+    static function venuMercedesBenz() { return profile390("venud"); }
 
     static function fr265() {
         return profile416("fr265");

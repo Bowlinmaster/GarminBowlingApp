@@ -29,10 +29,11 @@ An unknown product may receive a screen-size fallback profile. A fallback render
 ## Current Build Baseline
 
 - SDK: Connect IQ 9.2.0
-- Checked: 2026-09-24
-- Result: full release package passed all 52 SDK-expanded builds for the 37 manifest product IDs
+- Checked: 2026-09-25
+- Result: full release package passed all 90 SDK-expanded builds for the 68 manifest product IDs
 - Visual baselines checked: 2026-09-14
 - Visual baseline result: all nine scenarios captured for all nine representative screen families
+- Expansion regression check: `new-game` and `tenth-frame` remained pixel-identical on the 390x390, 416x416, and 454x454 representatives on 2026-09-25
 
 ## Compatibility Matrix
 
@@ -40,7 +41,22 @@ Every row below passed the current release package build. `Visual baseline` mean
 
 | Product ID | Garmin device family | Part number(s) | Screen | Display | Input | Layout profile | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| `approachs50` | Approach S50 | `006-B4656-00` | 390x390 round | AMOLED | Touch + buttons | `approachS50()` | Build verified; visual pending |
+| `approachs7042mm` | Approach S70 42mm | `006-B4233-00` | 390x390 round | AMOLED | Touch + buttons | `approachS7042mm()` | Build verified; visual pending |
+| `approachs7047mm` | Approach S70 47mm | `006-B4234-00` | 454x454 round | AMOLED | Touch + buttons | `approachS7047mm()` | Build verified; visual pending |
+| `d2air` | D2 Air | `006-B2187-00` | 390x390 round | AMOLED | Touch + buttons | `d2Air()` | Build verified; visual pending |
+| `d2airx10` | D2 Air X10 | `006-B4125-00` | 416x416 round | AMOLED | Touch + buttons | `d2AirX10()` | Build verified; visual pending |
+| `d2mach1` | D2 Mach 1 | `006-B4079-00` | 416x416 round | AMOLED | Touch + buttons | `d2Mach1()` | Build verified; visual pending |
+| `d2mach2` | D2 Mach 2 | `006-B4879-00` | 454x454 round | AMOLED | Touch + buttons | `d2Mach2()` | Build verified; visual pending |
+| `d2mach2pro` | D2 Mach 2 Pro | `006-B5056-00` | 454x454 round | AMOLED | Touch + buttons | `d2Mach2Pro()` | Build verified; visual pending |
+| `descentg2` | Descent G2 | `006-B4588-00` | 390x390 round | AMOLED | Touch + buttons | `descentG2()` | Build verified; visual pending |
+| `descentmk343mm` | Descent Mk3 / Mk3i 43mm | `006-B4222-00` | 390x390 round | AMOLED | Touch + buttons | `descentMk343mm()` | Build verified; visual pending |
+| `descentmk351mm` | Descent Mk3i 51mm | `006-B4223-00` | 454x454 round | AMOLED | Touch + buttons | `descentMk351mm()` | Build verified; visual pending |
 | `enduro3` | Enduro 3 | `006-B4575-00` | 280x280 round | MIP | Touch + buttons | `enduro3()` | Build verified; visual pending |
+| `epix2` | epix (Gen 2) / quatix 7 Sapphire | `006-B3943-00`, `006-B3944-00` | 416x416 round | AMOLED | Touch + buttons | `epix2()` | Build verified; visual pending |
+| `epix2pro42mm` | epix Pro (Gen 2) 42mm | `006-B4312-00` | 390x390 round | AMOLED | Touch + buttons | `epix2Pro42mm()` | Build verified; visual pending |
+| `epix2pro47mm` | epix Pro (Gen 2) 47mm / quatix 7 Pro | `006-B4313-00` | 416x416 round | AMOLED | Touch + buttons | `epix2Pro47mm()` | Build verified; visual pending |
+| `epix2pro51mm` | epix Pro (Gen 2) 51mm / D2 Mach 1 Pro / tactix 7 AMOLED | `006-B4314-00`, `006-B4542-00`, `006-B4556-00` | 454x454 round | AMOLED | Touch + buttons | `epix2Pro51mm()` | Build verified; visual pending |
 | `fenix7` | fenix 7 / quatix 7 | `006-B3906-00`, `006-B3909-00` | 260x260 round | MIP | Touch + buttons | `fenix7()` | Build verified; visual baseline |
 | `fenix7pro` | fenix 7 Pro | `006-B4375-00` | 260x260 round | MIP | Touch + buttons | `fenix7Pro()` | Build verified; visual pending |
 | `fenix7pronowifi` | fenix 7 Pro Solar, no Wi-Fi | `006-B4595-00` | 260x260 round | MIP | Touch + buttons | `fenix7ProNoWifi()` | Build verified; visual pending |
@@ -51,10 +67,18 @@ Every row below passed the current release package build. `Visual baseline` mean
 | `fenix7xpronowifi` | fenix 7X Pro Solar, no Wi-Fi | `006-B4596-00` | 280x280 round | MIP | Touch + buttons | `fenix7xProNoWifi()` | Build verified; visual pending |
 | `fenix843mm` | fenix 8 43mm | `006-B4534-00` | 416x416 round | AMOLED | Touch + buttons | `fenix843mm()` | Build verified; visual pending |
 | `fenix847mm` | fenix 8 / tactix 8 / quatix 8, 47mm and 51mm AMOLED | `006-B4536-00`, `006-B4775-00` | 454x454 round | AMOLED | Touch + buttons | `fenix847mm()` | Build verified; visual pending |
+| `fenix8pro47mm` | fenix 8 Pro / quatix 8 Pro 47mm and 51mm | `006-B4631-00` | 454x454 round | AMOLED | Touch + buttons | `fenix8Pro47mm()` | Build verified; visual pending |
 | `fenix8solar47mm` | fenix 8 Solar 47mm | `006-B4532-00` | 260x260 round | MIP | Touch + buttons | `fenix8Solar47mm()` | Build verified; visual pending |
 | `fenix8solar51mm` | fenix 8 / tactix 8 Solar 51mm | `006-B4533-00`, `006-B4776-00` | 280x280 round | MIP | Touch + buttons | `fenix8Solar51mm()` | Build verified; visual pending |
+| `fenix943mm` | fenix 9 43mm | `006-B5133-00` | 416x416 round | AMOLED | Touch + buttons | `fenix943mm()` | Build verified; visual pending |
+| `fenix947mm` | fenix 9 47mm / 51mm | `006-B5134-00` | 454x454 round | AMOLED | Touch + buttons | `fenix947mm()` | Build verified; visual pending |
+| `fenix9pro43mm` | fenix 9 Pro 43mm | `006-B4952-00` | 416x416 round | AMOLED | Touch + buttons | `fenix9Pro43mm()` | Build verified; visual pending |
+| `fenix9pro47mm` | fenix 9 Pro 47mm | `006-B4953-00` | 454x454 round | AMOLED | Touch + buttons | `fenix9Pro47mm()` | Build verified; visual pending |
+| `fenixe` | fenix E | `006-B4666-00` | 416x416 round | AMOLED | Touch + buttons | `fenixE()` | Build verified; visual pending |
 | `fr165` | Forerunner 165 | `006-B4432-00` | 390x390 round | AMOLED | Touch + buttons | `fr165()` | Build verified; visual pending |
 | `fr165m` | Forerunner 165 Music | `006-B4433-00` | 390x390 round | AMOLED | Touch + buttons | `fr165Music()` | Build verified; visual pending |
+| `fr170` | Forerunner 170 | `006-B4815-00` | 390x390 round | AMOLED | Touch + buttons | `fr170()` | Build verified; visual pending |
+| `fr170m` | Forerunner 170 Music | `006-B4814-00` | 390x390 round | AMOLED | Touch + buttons | `fr170Music()` | Build verified; visual pending |
 | `fr255` | Forerunner 255 | `006-B3992-00` | 260x260 round | MIP | Buttons | `fr255()` | Build verified; visual pending |
 | `fr255m` | Forerunner 255 Music | `006-B3990-00` | 260x260 round | MIP | Buttons | `fr255Music()` | Build verified; visual pending |
 | `fr255s` | Forerunner 255S | `006-B3993-00` | 218x218 round | MIP | Buttons | `fr255s()` | Build verified; visual baseline |
@@ -63,9 +87,16 @@ Every row below passed the current release package build. `Visual baseline` mean
 | `fr265s` | Forerunner 265S | `006-B4258-00` | 360x360 round | AMOLED | Touch + buttons | `fr265s()` | Build verified; visual baseline |
 | `fr57042mm` | Forerunner 570 42mm | `006-B4574-00` | 390x390 round | AMOLED | Touch + buttons | `fr57042mm()` | Build verified; visual pending |
 | `fr57047mm` | Forerunner 570 47mm | `006-B4570-00` | 454x454 round | AMOLED | Touch + buttons | `fr57047mm()` | Build verified; visual pending |
+| `fr70` | Forerunner 70 | `006-B4916-00`, `006-B5214-00` | 390x390 round | AMOLED | Touch + buttons | `fr70()` | Build verified; visual pending |
 | `fr955` | Forerunner 955 / Solar | `006-B4024-00` | 260x260 round | MIP | Touch + buttons | `fr955()` | Build verified; visual pending |
 | `fr965` | Forerunner 965 | `006-B4315-00` | 454x454 round | AMOLED | Touch + buttons | `fr965()` | Build verified; visual pending |
 | `fr970` | Forerunner 970 | `006-B4565-00` | 454x454 round | AMOLED | Touch + buttons | `fr970()` | Build verified; visual baseline |
+| `instinct3amoled45mm` | Instinct 3 AMOLED 45mm | `006-B4586-00` | 390x390 round | AMOLED | Buttons | `instinct3Amoled45mm()` | Build verified; visual pending |
+| `instinct3amoled50mm` | Instinct 3 AMOLED 50mm | `006-B4587-00` | 416x416 round | AMOLED | Buttons | `instinct3Amoled50mm()` | Build verified; visual pending |
+| `instinctcrossoveramoled` | Instinct Crossover AMOLED | `006-B4678-00` | 390x390 round | AMOLED | Buttons | `instinctCrossoverAmoled()` | Build verified; visual pending |
+| `marq2` | MARQ (Gen 2) | `006-B4105-00`, `006-B4472-00` | 390x390 round | AMOLED | Touch + buttons | `marq2()` | Build verified; visual pending |
+| `marq2aviator` | MARQ (Gen 2) Aviator | `006-B4124-00` | 390x390 round | AMOLED | Touch + buttons | `marq2Aviator()` | Build verified; visual pending |
+| `venu` | Venu | `006-B3226-00`, `006-B3389-00` | 390x390 round | AMOLED | Touch + buttons | `venu()` | Build verified; visual pending |
 | `venu2` | Venu 2 | `006-B3703-00`, `006-B3950-00`, `006-B4171-00`, `006-B4180-00` | 416x416 round | AMOLED | Touch + buttons | `venu2()` | Build verified; visual pending |
 | `venu2plus` | Venu 2 Plus | `006-B3851-00`, `006-B4017-00` | 416x416 round | AMOLED | Touch + buttons | `venu2Plus()` | Build verified; visual pending |
 | `venu2s` | Venu 2S | `006-B3704-00`, `006-B3949-00`, `006-B4175-00`, `006-B4181-00` | 360x360 round | AMOLED | Touch + buttons | `venu2s()` | Build verified; visual pending |
@@ -73,6 +104,7 @@ Every row below passed the current release package build. `Visual baseline` mean
 | `venu3s` | Venu 3S | `006-B4261-00` | 390x390 round | AMOLED | Touch + buttons | `venu3s()` | Build verified; visual pending |
 | `venu441mm` | Venu 4 41mm | `006-B4644-00` | 390x390 round | AMOLED | Touch + buttons | `venu441mm()` | Build verified; visual pending |
 | `venu445mm` | Venu 4 45mm / D2 Air X15 | `006-B4643-00`, `006-B4944-00` | 454x454 round | AMOLED | Touch + buttons | `venu445mm()` | Build verified; visual pending |
+| `venud` | Venu Mercedes-Benz Collection | `006-B3740-00`, `006-B3737-00` | 390x390 round | AMOLED | Touch + buttons | `venuMercedesBenz()` | Build verified; visual pending |
 | `venusq2` | Venu Sq 2 | `006-B4115-00` | 320x360 rectangular | AMOLED | Touch + buttons | `venuSq2()` | Build verified; visual baseline |
 | `venusq2m` | Venu Sq 2 Music | `006-B4116-00` | 320x360 rectangular | AMOLED | Touch + buttons | `venuSq2Music()` | Build verified; visual pending |
 | `vivoactive5` | vivoactive 5 | `006-B4426-00` | 390x390 round | AMOLED | Touch + buttons | `vivoactive5()` | Build verified; visual pending |
