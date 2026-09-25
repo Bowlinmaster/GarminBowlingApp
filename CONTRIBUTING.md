@@ -15,6 +15,17 @@ Read [`BowlingStats/SUPPORTED_DEVICES.md`](BowlingStats/SUPPORTED_DEVICES.md) be
 
 Use the device-support issue form when requesting support for hardware you cannot test yourself.
 
+Generate the candidate inventory from the currently configured Connect IQ SDK:
+
+```powershell
+.\tools\Get-DeviceCandidates.ps1
+```
+
+The ignored report at `BowlingStats/bin/device-support-candidates.md` groups
+eligible wearables into existing-layout, constrained-memory, and new-layout
+waves. Pass `-IncludeSupported` to include products already in the manifest, or
+`-SdkPath` to inspect a specific SDK installation.
+
 ## Local Verification
 
 Run the compatibility script from the repository root:

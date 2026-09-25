@@ -110,6 +110,16 @@ For each representative device:
 
 ## Adding A Device
 
+Start by generating the candidate inventory from the active SDK:
+
+```powershell
+.\tools\Get-DeviceCandidates.ps1
+```
+
+The generated report is advisory. Devices in an existing visual family may use
+that profile as their initial values, but every added product still requires an
+explicit part-number mapping and named profile so it can be tuned independently.
+
 A device-support pull request should include:
 
 - Exact Garmin model and size.
