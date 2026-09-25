@@ -3,7 +3,7 @@
 ## App Details
 
 - **Name:** Bowling Stats
-- **Version:** 1.1.0
+- **Version:** 1.2.0
 - **Application type:** Device App
 - **Language:** English
 - **Category:** Select the closest bowling or sports category offered by the
@@ -27,7 +27,7 @@ Features:
 - Fast pin-count entry for every roll
 - Automatic strike, spare, and tenth-frame scoring
 - Live score previews before confirming a roll
-- Game history stored locally on the watch
+- Up to 500 detailed games stored locally on the watch
 - Statistics across all saved games
 - Series grouping for games completed during the same bowling session
 - Series statistics and individual game scorecards
@@ -48,16 +48,11 @@ is planned for a future version.
 
 ## What's New
 
-New in version 1.1.0:
+New in version 1.2.0:
 
-- Redesigned game-history navigation
-- Statistics across all saved games
-- Games grouped into bowling series
-- Statistics for individual series and games
-- Average, high/low game, and first-ball statistics
-- Strike, spare, single-pin spare, multi-pin spare, and clean-frame rates
-- Made/attempt counts displayed alongside percentages
-- Improved statistics navigation and layout spacing
+- Expanded detailed game history from 100 to 500 games
+- Faster and more memory-efficient saving and loading of large game histories
+- Automatic migration of existing saved games and lifetime statistics
 
 ## Store Links
 

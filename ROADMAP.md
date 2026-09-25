@@ -45,6 +45,11 @@
    - Show both percentages and made/attempt counts for conversion statistics.
    - Keep lifetime reads constant-time and calculate selected-series metrics
      directly from compact packed rolls.
+20. Scale saved-game history with paged storage:
+   - Store fixed-size game records in compact `ByteArray` pages.
+   - Keep lifetime statistics and sequence data in a small metadata record.
+   - Raise detailed game retention from 100 to 500 games.
+   - Migrate existing version-five history without discarding lifetime totals.
 
 ## Remaining
 
@@ -70,7 +75,6 @@
      support requests when hardware is unavailable locally.
 ## Future Features
 
-- Evaluate a `ByteArray` storage migration if measurements justify it.
 - Investigate compile-time device-specific layouts using resource qualifiers and
   Jungle-selected source profiles. Compare executable size, runtime heap, and
   graphics-pool usage with the current runtime profile system while retaining

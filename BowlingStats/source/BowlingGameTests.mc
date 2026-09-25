@@ -219,11 +219,17 @@ function testSavedGameStoreSavesAndReadsCompletedGame(logger) {
 
     var saved = BowlingSavedGameStore.saveGameAt(game, 1770000200);
     var savedGame = BowlingSavedGameStore.getSavedGame(0) as Lang.Dictionary;
+    var metadata = Application.Storage.getValue(BOWLING_SAVED_GAMES_META_KEY) as Lang.Array;
+    var page = Application.Storage.getValue(BOWLING_SAVED_GAMES_PAGE_KEY_PREFIX + "0") as Lang.ByteArray;
+    var legacy = Application.Storage.getValue(BOWLING_SAVED_GAMES_STORAGE_KEY);
     BowlingSavedGameStore.clearSavedGames();
 
     return saved &&
            savedGame[BOWLING_SAVED_GAME_SAVED_AT] == 1770000200 &&
-           savedGame[BOWLING_SAVED_GAME_SCORE] == 300;
+           savedGame[BOWLING_SAVED_GAME_SCORE] == 300 &&
+           metadata[0] == BOWLING_SAVED_GAMES_FORMAT_VERSION &&
+           page.size() == BOWLING_SAVED_GAME_BYTE_RECORD_SIZE &&
+           legacy == null;
 }
 
 (:test)
@@ -268,27 +274,47 @@ function testSavedGameStoreEvictsOldestAtCapacity(logger) {
     BowlingSavedGameStore.clearSavedGames();
 
     var perfectGame = buildPerfectGameForStorageTest();
-    var oldRecord = BowlingSavedGameStore.buildRecord(perfectGame, 1770000450);
-    var stored = buildPerfectGameStoreForTest(BOWLING_SAVED_GAMES_MAX_COUNT);
-    for (var i = 0; i < BOWLING_SAVED_GAMES_MAX_COUNT; i++) {
-        stored.addAll(oldRecord);
+    var firstSavedAt = 1770000450;
+    for (var i = 0; i <= BOWLING_SAVED_GAMES_MAX_COUNT; i++) {
+        if (!BowlingSavedGameStore.saveGameAt(perfectGame, firstSavedAt + i)) {
+            BowlingSavedGameStore.clearSavedGames();
+            return false;
+        }
     }
-    Application.Storage.setValue(BOWLING_SAVED_GAMES_STORAGE_KEY, stored);
-
-    var gutterGame = buildGameThroughNineFramesForTest();
-    gutterGame.recordThrow(0);
-    gutterGame.recordThrow(0);
-    var saved = BowlingSavedGameStore.saveGameAt(gutterGame, 1770000460);
     var newest = BowlingSavedGameStore.getSavedGameSummary(0) as Lang.Dictionary?;
     var oldest = BowlingSavedGameStore.getSavedGameSummary(BOWLING_SAVED_GAMES_MAX_COUNT - 1) as Lang.Dictionary?;
     var count = BowlingSavedGameStore.getSavedGameCount();
     var aggregate = BowlingSavedGameStore.getAggregateStatistics();
     BowlingSavedGameStore.clearSavedGames();
 
-    return saved && count == BOWLING_SAVED_GAMES_MAX_COUNT &&
-           newest != null && newest[BOWLING_SAVED_GAME_SAVED_AT] == 1770000460 &&
-           oldest != null && oldest[BOWLING_SAVED_GAME_SAVED_AT] == 1770000450 &&
+    return count == BOWLING_SAVED_GAMES_MAX_COUNT &&
+           newest != null && newest[BOWLING_SAVED_GAME_SAVED_AT] == firstSavedAt + BOWLING_SAVED_GAMES_MAX_COUNT &&
+           oldest != null && oldest[BOWLING_SAVED_GAME_SAVED_AT] == firstSavedAt + 1 &&
            aggregate[BOWLING_STAT_GAME_COUNT] == BOWLING_SAVED_GAMES_MAX_COUNT + 1;
+}
+
+(:test)
+function testSavedGameStoreRollsOverToANewPage(logger) {
+    BowlingSavedGameStore.clearSavedGames();
+    var game = buildPerfectGameForStorageTest();
+    var firstSavedAt = 1770005000;
+    for (var i = 0; i <= BOWLING_SAVED_GAMES_PAGE_SIZE; i++) {
+        if (!BowlingSavedGameStore.saveGameAt(game, firstSavedAt + i)) {
+            BowlingSavedGameStore.clearSavedGames();
+            return false;
+        }
+    }
+
+    var firstPage = Application.Storage.getValue(BOWLING_SAVED_GAMES_PAGE_KEY_PREFIX + "0") as Lang.ByteArray;
+    var secondPage = Application.Storage.getValue(BOWLING_SAVED_GAMES_PAGE_KEY_PREFIX + "1") as Lang.ByteArray;
+    var newest = BowlingSavedGameStore.getSavedGameSummary(0) as Lang.Dictionary;
+    var oldest = BowlingSavedGameStore.getSavedGameSummary(BOWLING_SAVED_GAMES_PAGE_SIZE) as Lang.Dictionary;
+    BowlingSavedGameStore.clearSavedGames();
+
+    return firstPage.size() == BOWLING_SAVED_GAMES_PAGE_SIZE * BOWLING_SAVED_GAME_BYTE_RECORD_SIZE &&
+           secondPage.size() == BOWLING_SAVED_GAME_BYTE_RECORD_SIZE &&
+           newest[BOWLING_SAVED_GAME_SAVED_AT] == firstSavedAt + BOWLING_SAVED_GAMES_PAGE_SIZE &&
+           oldest[BOWLING_SAVED_GAME_SAVED_AT] == firstSavedAt;
 }
 
 (:test)
@@ -354,13 +380,13 @@ function testSavedGameStoreRemovesBadRecordWhenRead(logger) {
     var countAfterRead = BowlingSavedGameStore.getSavedGameCount();
     BowlingSavedGameStore.clearSavedGames();
 
-    return countBeforeRead == 2 && countAfterRead == 1 &&
+    return countBeforeRead == 1 && countAfterRead == 1 &&
            savedGame[BOWLING_SAVED_GAME_SCORE] == 300;
 }
 
 (:test)
 function testSavedGameStoreHandlesMalformedHeader(logger) {
-    Application.Storage.setValue(BOWLING_SAVED_GAMES_STORAGE_KEY, [BOWLING_SAVED_GAMES_FORMAT_VERSION, "two"]);
+    Application.Storage.setValue(BOWLING_SAVED_GAMES_STORAGE_KEY, [BOWLING_SAVED_GAMES_VERSION_FIVE, "two"]);
     var invalidCount = BowlingSavedGameStore.getSavedGameCount();
 
     Application.Storage.setValue(BOWLING_SAVED_GAMES_STORAGE_KEY, [999, 1]);
@@ -371,7 +397,7 @@ function testSavedGameStoreHandlesMalformedHeader(logger) {
 }
 
 (:test)
-function testSavedGameStoreDefersHistoricalValidationUntilRead(logger) {
+function testSavedGameStoreValidatesLegacyRecordsDuringMigration(logger) {
     BowlingSavedGameStore.clearSavedGames();
 
     var validRecord = BowlingSavedGameStore.buildRecord(buildPerfectGameForStorageTest(), 1770000800);
@@ -388,16 +414,16 @@ function testSavedGameStoreDefersHistoricalValidationUntilRead(logger) {
     }
 
     var saved = BowlingSavedGameStore.saveGameAt(newGame, 1770000900);
-    var storedAfterSave = Application.Storage.getValue(BOWLING_SAVED_GAMES_STORAGE_KEY) as Lang.Array;
+    var storedAfterSave = Application.Storage.getValue(BOWLING_SAVED_GAMES_META_KEY) as Lang.Array;
     var newestGame = BowlingSavedGameStore.getSavedGame(0) as Lang.Dictionary;
     var countBeforeHistoricalRead = BowlingSavedGameStore.getSavedGameCount();
     var olderGame = BowlingSavedGameStore.getSavedGame(1) as Lang.Dictionary;
     var countAfterHistoricalRead = BowlingSavedGameStore.getSavedGameCount();
     BowlingSavedGameStore.clearSavedGames();
 
-    return saved && storedAfterSave[1] == 3 &&
+    return saved && storedAfterSave[BOWLING_SAVED_GAMES_COUNT_INDEX] == 2 &&
            newestGame[BOWLING_SAVED_GAME_SCORE] == 0 &&
-           countBeforeHistoricalRead == 3 &&
+           countBeforeHistoricalRead == 2 &&
            olderGame[BOWLING_SAVED_GAME_SCORE] == 300 &&
            countAfterHistoricalRead == 2;
 }
@@ -437,6 +463,30 @@ function testSavedGameSummaryRemovesMalformedRecord(logger) {
     return summary != null &&
            summary[BOWLING_SAVED_GAME_SAVED_AT] == 1770001100 &&
            summary[BOWLING_SAVED_GAME_SCORE] == 300 &&
+           remainingCount == 1;
+}
+
+(:test)
+function testPagedStoreRemovesCorruptRecordWhenRead(logger) {
+    BowlingSavedGameStore.clearSavedGames();
+    BowlingSavedGameStore.saveGameAt(buildPerfectGameForStorageTest(), 1770001150);
+
+    var gutterGame = buildGameThroughNineFramesForTest();
+    gutterGame.recordThrow(0);
+    gutterGame.recordThrow(0);
+    BowlingSavedGameStore.saveGameAt(gutterGame, 1770001160);
+
+    var pageKey = BOWLING_SAVED_GAMES_PAGE_KEY_PREFIX + "0";
+    var page = Application.Storage.getValue(pageKey) as Lang.ByteArray;
+    page[BOWLING_SAVED_GAME_BYTE_RECORD_SIZE + 6] = 22;
+    Application.Storage.setValue(pageKey, page);
+
+    var recovered = BowlingSavedGameStore.getSavedGame(0) as Lang.Dictionary?;
+    var remainingCount = BowlingSavedGameStore.getSavedGameCount();
+    BowlingSavedGameStore.clearSavedGames();
+
+    return recovered != null &&
+           recovered[BOWLING_SAVED_GAME_SCORE] == 300 &&
            remainingCount == 1;
 }
 
@@ -625,12 +675,14 @@ function testVersionTwoStoreMigratesStatisticsOnce(logger) {
     Application.Storage.setValue(BOWLING_SAVED_GAMES_STORAGE_KEY, legacy);
 
     var statistics = BowlingSavedGameStore.getAggregateStatistics();
-    var migrated = Application.Storage.getValue(BOWLING_SAVED_GAMES_STORAGE_KEY) as Lang.Array;
+    var migrated = Application.Storage.getValue(BOWLING_SAVED_GAMES_META_KEY) as Lang.Array;
+    var legacyAfterMigration = Application.Storage.getValue(BOWLING_SAVED_GAMES_STORAGE_KEY);
     var savedCount = BowlingSavedGameStore.getSavedGameCount();
     BowlingSavedGameStore.clearSavedGames();
 
     return migrated[0] == BOWLING_SAVED_GAMES_FORMAT_VERSION &&
-           migrated.size() == BOWLING_SAVED_GAMES_HEADER_SIZE + (2 * BOWLING_SAVED_GAME_RECORD_SIZE) &&
+           migrated.size() == BOWLING_SAVED_GAMES_HEADER_SIZE &&
+           legacyAfterMigration == null &&
            savedCount == 2 &&
            statistics[BOWLING_STAT_GAME_COUNT] == 2 &&
            statistics[BOWLING_STAT_TOTAL_SCORE] == 300 &&
@@ -668,15 +720,64 @@ function testVersionFourStoreMigratesDetailedStatistics(logger) {
     Application.Storage.setValue(BOWLING_SAVED_GAMES_STORAGE_KEY, previous);
 
     var statistics = BowlingSavedGameStore.getAggregateStatistics();
-    var migrated = Application.Storage.getValue(BOWLING_SAVED_GAMES_STORAGE_KEY) as Lang.Array;
+    var migrated = Application.Storage.getValue(BOWLING_SAVED_GAMES_META_KEY) as Lang.Array;
     BowlingSavedGameStore.clearSavedGames();
 
     return migrated[0] == BOWLING_SAVED_GAMES_FORMAT_VERSION &&
-           migrated.size() == BOWLING_SAVED_GAMES_HEADER_SIZE + (2 * BOWLING_SAVED_GAME_RECORD_SIZE) &&
+           migrated.size() == BOWLING_SAVED_GAMES_HEADER_SIZE &&
            statistics[BOWLING_STAT_LOW_SCORE] == 0 &&
            statistics[BOWLING_STAT_CLEAN_FRAMES] == 10 &&
            statistics[BOWLING_STAT_SINGLE_PIN_ATTEMPTS] == 0 &&
            statistics[BOWLING_STAT_MULTI_PIN_ATTEMPTS] == 10;
+}
+
+(:test)
+function testVersionFiveStorePreservesLifetimeStatistics(logger) {
+    BowlingSavedGameStore.clearSavedGames();
+    var perfectRecord = BowlingSavedGameStore.buildRecord(buildPerfectGameForStorageTest(), 1770001900);
+    var gutterGame = buildGameThroughNineFramesForTest();
+    gutterGame.recordThrow(0);
+    gutterGame.recordThrow(0);
+    var gutterRecord = BowlingSavedGameStore.buildRecord(gutterGame, 1770002000);
+    var versionFive = [
+        BOWLING_SAVED_GAMES_VERSION_FIVE,
+        2,
+        3,
+        600,
+        300,
+        200,
+        20,
+        10,
+        0,
+        10,
+        2,
+        600,
+        300,
+        1,
+        0,
+        0,
+        0,
+        10,
+        0,
+        20
+    ] as Lang.Array;
+    versionFive.addAll(gutterRecord);
+    versionFive.addAll(perfectRecord);
+    Application.Storage.setValue(BOWLING_SAVED_GAMES_STORAGE_KEY, versionFive);
+
+    var statistics = BowlingSavedGameStore.getAggregateStatistics();
+    var retainedCount = BowlingSavedGameStore.getSavedGameCount();
+    var legacyAfterMigration = Application.Storage.getValue(BOWLING_SAVED_GAMES_STORAGE_KEY);
+    BowlingSavedGameStore.clearSavedGames();
+
+    return retainedCount == 2 &&
+           legacyAfterMigration == null &&
+           statistics[BOWLING_STAT_GAME_COUNT] == 3 &&
+           statistics[BOWLING_STAT_TOTAL_SCORE] == 600 &&
+           statistics[BOWLING_STAT_HIGH_SCORE] == 300 &&
+           statistics[BOWLING_STAT_LOW_SCORE] == 0 &&
+           statistics[BOWLING_STAT_STRIKES] == 20 &&
+           statistics[BOWLING_STAT_OPEN_FRAMES] == 10;
 }
 
 function buildPerfectGameForStorageTest() as BowlingGame {
@@ -699,7 +800,7 @@ function buildGameThroughNineFramesForTest() as BowlingGame {
 
 function buildPerfectGameStoreForTest(count as Number) as Lang.Array {
     return [
-        BOWLING_SAVED_GAMES_FORMAT_VERSION,
+        BOWLING_SAVED_GAMES_VERSION_FIVE,
         count,
         count,
         count * 300,

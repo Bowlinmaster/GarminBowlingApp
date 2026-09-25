@@ -29,7 +29,7 @@ An unknown product may receive a screen-size fallback profile. A fallback render
 ## Current Build Baseline
 
 - SDK: Connect IQ 9.2.0
-- Checked: 2026-09-16
+- Checked: 2026-09-24
 - Result: full release package passed all 52 SDK-expanded builds for the 37 manifest product IDs
 - Visual baselines checked: 2026-09-14
 - Visual baseline result: all nine scenarios captured for all nine representative screen families
