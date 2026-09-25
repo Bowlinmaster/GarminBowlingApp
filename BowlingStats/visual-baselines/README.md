@@ -37,6 +37,13 @@ normal capture directory or compare against baselines, use:
     -Overwrite
 ```
 
+`-Device` can name any product in the production `manifest.xml`, including a
+newly added product that is not in the visual baseline manifest. The build
+script generates an ignored gallery manifest from the production product list.
+For products without committed baselines, capture automation validates image
+dimensions, generates a shape-aware preview, and leaves final review to the
+developer. `-All` captures only the baseline representatives.
+
 The automation uses Garmin's own **Save Screen Capture** command. The gallery's
 development-only 3-by-8 scenario grid provides deterministic button and touch
 navigation; it is not included in production builds or baseline screenshots.
@@ -51,7 +58,7 @@ when necessary, launches the matching PRG, and creates its capture directory:
 .\tools\Start-VisualGallery.ps1 -DeveloperKey C:\path\to\developer_key -Device fenix7x
 ```
 
-Walk through every representative device in manifest order with one command:
+Walk through every baseline representative in manifest order with one command:
 
 ```powershell
 .\tools\Start-VisualGallery.ps1 -DeveloperKey C:\path\to\developer_key -All
@@ -68,7 +75,8 @@ PowerShell session:
 $env:GARMIN_DEVELOPER_KEY = "C:\path\to\developer_key"
 ```
 
-Then the launcher only needs `-Device fenix7x` or `-All`.
+Then the launcher only needs `-Device fenix7x` or `-All`. Any production
+manifest product is valid with `-Device`.
 
 ### Raw SDK commands
 
@@ -79,9 +87,12 @@ SDK does not require hard-coded path changes:
 ```powershell
 $sdk = (Get-Content "$env:APPDATA\Garmin\ConnectIQ\current-sdk.cfg" -Raw).Trim()
 & "$sdk\bin\connectiq.bat"
-& "$sdk\bin\monkeyc.bat" -f .\BowlingStats\visual-test.jungle -d fenix7x -o .\BowlingStats\bin\visual-gallery-fenix7x.prg -y C:\path\to\developer_key -w -l 1
+& "$sdk\bin\monkeyc.bat" -f .\BowlingStats\visual-test.generated.jungle -d fenix7x -o .\BowlingStats\bin\visual-gallery-fenix7x.prg -y C:\path\to\developer_key -w -l 1
 & "$sdk\bin\monkeydo.bat" .\BowlingStats\bin\visual-gallery-fenix7x.prg fenix7x
 ```
+
+Run `Build-VisualGallery.ps1` once before the raw gallery compiler command so
+the ignored generated manifest and Jungle file exist.
 
 For the production app, replace the final two commands with:
 
@@ -90,13 +101,13 @@ For the production app, replace the final two commands with:
 & "$sdk\bin\monkeydo.bat" .\BowlingStats\bin\BowlingStats.prg fenix7x
 ```
 
-Build one representative device while iterating:
+Build any supported device while iterating:
 
 ```powershell
 .\tools\Build-VisualGallery.ps1 -DeveloperKey C:\path\to\developer_key -Device fenix7x
 ```
 
-Omit `-Device` to build all representatives. With the Connect IQ simulator running, launch the generated PRG using the SDK's `monkeydo` command:
+Omit `-Device` to build all baseline representatives. With the Connect IQ simulator running, launch the generated PRG using the SDK's `monkeydo` command:
 
 ```powershell
 monkeydo BowlingStats\bin\visual-gallery-fenix7x.prg fenix7x

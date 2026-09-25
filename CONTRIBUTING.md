@@ -59,6 +59,11 @@ simulator, saves display-only screenshots, validates their dimensions, and
 runs the baseline comparison. See the visual workflow documentation for manual
 launch and capture fallbacks.
 
+`-Device` accepts any product in the production manifest. Products without a
+committed visual baseline still receive dimension and screen-shape validation,
+but their screenshots require manual review. `-All` remains intentionally
+limited to the baseline representatives so routine regression runs stay small.
+
 Capture and compare every affected scenario on each affected representative device before committing. When a difference is intentional, review the candidate image and then promote it explicitly:
 
 ```powershell

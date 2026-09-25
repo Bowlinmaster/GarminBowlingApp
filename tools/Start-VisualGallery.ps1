@@ -14,6 +14,10 @@ $visualManifestPath = Join-Path $projectRoot "visual-baselines\manifest.json"
 $visualManifest = Get-Content -LiteralPath $visualManifestPath -Raw | ConvertFrom-Json
 $visualDevices = @($visualManifest.devices | ForEach-Object { $_.id })
 $scenarioIds = @($visualManifest.scenarios | ForEach-Object { $_.id })
+$applicationManifest = [xml](Get-Content -LiteralPath (Join-Path $projectRoot "manifest.xml"))
+$applicationNamespace = New-Object System.Xml.XmlNamespaceManager($applicationManifest.NameTable)
+$applicationNamespace.AddNamespace("iq", "http://www.garmin.com/xml/connectiq")
+$supportedDevices = @($applicationManifest.SelectNodes("//iq:product", $applicationNamespace) | ForEach-Object { $_.id })
 
 if ([string]::IsNullOrWhiteSpace($SdkPath)) {
     $currentSdkFile = Join-Path $env:APPDATA "Garmin\ConnectIQ\current-sdk.cfg"
@@ -33,13 +37,13 @@ if ($All -and ![string]::IsNullOrWhiteSpace($Device)) {
     throw "Pass either -Device or -All, not both."
 }
 if (!$All -and [string]::IsNullOrWhiteSpace($Device)) {
-    throw "Pass -Device <id> for one representative or -All for every representative."
+    throw "Pass -Device <id> for a supported product or -All for every baseline representative."
 }
 
 $selectedDevices = @(if ($All) { $visualDevices } else { $Device })
 foreach ($deviceId in $selectedDevices) {
-    if ($visualDevices -notcontains $deviceId) {
-        throw "Device '$deviceId' is not a visual-gallery representative. Valid devices: $($visualDevices -join ', ')."
+    if ($supportedDevices -notcontains $deviceId) {
+        throw "Device '$deviceId' is not in the production manifest."
     }
 }
 

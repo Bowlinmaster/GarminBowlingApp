@@ -18,6 +18,10 @@ $baselineManifestPath = Join-Path $projectRoot "visual-baselines\manifest.json"
 $baselineManifest = Get-Content -LiteralPath $baselineManifestPath -Raw | ConvertFrom-Json
 $visualDevices = @($baselineManifest.devices | ForEach-Object { $_.id })
 $scenarioIds = @($baselineManifest.scenarios | ForEach-Object { $_.id })
+$applicationManifest = [xml](Get-Content -LiteralPath (Join-Path $projectRoot "manifest.xml"))
+$applicationNamespace = New-Object System.Xml.XmlNamespaceManager($applicationManifest.NameTable)
+$applicationNamespace.AddNamespace("iq", "http://www.garmin.com/xml/connectiq")
+$supportedDevices = @($applicationManifest.SelectNodes("//iq:product", $applicationNamespace) | ForEach-Object { $_.id })
 
 if ([string]::IsNullOrWhiteSpace($SdkPath)) {
     $currentSdkFile = Join-Path $env:APPDATA "Garmin\ConnectIQ\current-sdk.cfg"
@@ -31,13 +35,13 @@ if ($All -and $Device) {
     throw "Pass either -Device or -All, not both."
 }
 if (!$All -and !$Device) {
-    throw "Pass -Device <id> for one or more representatives, or pass -All."
+    throw "Pass -Device <id> for one or more supported products, or pass -All for every baseline representative."
 }
 
 $selectedDevices = @(if ($All) { $visualDevices } else { $Device })
 foreach ($deviceId in $selectedDevices) {
-    if ($visualDevices -notcontains $deviceId) {
-        throw "Device '$deviceId' is not a visual-gallery representative. Valid devices: $($visualDevices -join ', ')."
+    if ($supportedDevices -notcontains $deviceId) {
+        throw "Device '$deviceId' is not in the production manifest."
     }
 }
 $selectedScenarios = @(if ($Scenario) { $Scenario } else { $scenarioIds })
@@ -410,12 +414,11 @@ foreach ($deviceId in $selectedDevices) {
 
         $capture = [System.Drawing.Image]::FromFile($capturePath)
         try {
-            $deviceConfig = $baselineManifest.devices |
-                Where-Object { $_.id -eq $deviceId } |
-                Select-Object -First 1
-            if ($capture.Width -ne $deviceConfig.width -or
-                $capture.Height -ne $deviceConfig.height) {
-                throw "$scenarioId capture is $($capture.Width)x$($capture.Height); expected $($deviceConfig.width)x$($deviceConfig.height)."
+            $expectedWidth = $simulatorMetadata.display.location.width
+            $expectedHeight = $simulatorMetadata.display.location.height
+            if ($capture.Width -ne $expectedWidth -or
+                $capture.Height -ne $expectedHeight) {
+                throw "$scenarioId capture is $($capture.Width)x$($capture.Height); expected $($expectedWidth)x$($expectedHeight)."
             }
         } finally {
             $capture.Dispose()
@@ -426,7 +429,56 @@ foreach ($deviceId in $selectedDevices) {
 Write-Host ""
 Write-Host "Captured $($plannedCaptures.Count) visual scenario(s) under $OutputRoot."
 if (!$SkipComparison) {
-    & (Join-Path $PSScriptRoot "Test-VisualBaselines.ps1") `
-        -Device $selectedDevices `
-        -Scenario $selectedScenarios
+    $baselineDevices = @($selectedDevices | Where-Object { $visualDevices -contains $_ })
+    if ($baselineDevices.Count -gt 0) {
+        & (Join-Path $PSScriptRoot "Test-VisualBaselines.ps1") `
+            -Device $baselineDevices `
+            -Scenario $selectedScenarios
+    }
+
+    $unbaselinedDevices = @($selectedDevices | Where-Object { $visualDevices -notcontains $_ })
+    if ($unbaselinedDevices.Count -gt 0) {
+        $previewDevices = foreach ($deviceId in $unbaselinedDevices) {
+            $metadataPath = Join-Path $deviceRoot "$deviceId\simulator.json"
+            $metadata = Get-Content -LiteralPath $metadataPath -Raw | ConvertFrom-Json
+            $width = $metadata.display.location.width
+            $height = $metadata.display.location.height
+            $shape = $metadata.display.shape
+            $matchingFamily = $baselineManifest.devices |
+                Where-Object {
+                    $_.width -eq $width -and
+                    $_.height -eq $height -and
+                    $_.shape -eq $shape
+                } |
+                Select-Object -First 1
+            $safeInset = if ($matchingFamily) {
+                $matchingFamily.safeInset
+            } else {
+                [Math]::Ceiling([Math]::Min($width, $height) * 0.03)
+            }
+
+            [ordered]@{
+                id = $deviceId
+                width = $width
+                height = $height
+                shape = $shape
+                safeInset = $safeInset
+            }
+        }
+
+        $previewManifestPath = Join-Path $projectRoot "bin\visual-preview-manifest.generated.json"
+        [ordered]@{
+            schemaVersion = 2
+            backgroundColor = $baselineManifest.backgroundColor
+            devices = @($previewDevices)
+            scenarios = @($baselineManifest.scenarios)
+        } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $previewManifestPath
+
+        & (Join-Path $PSScriptRoot "New-VisualPreviews.ps1") `
+            -ManifestPath $previewManifestPath `
+            -ImageRoot $OutputRoot `
+            -Device $unbaselinedDevices `
+            -Scenario $selectedScenarios
+        Write-Host "No committed baseline for: $($unbaselinedDevices -join ', '). Capture dimensions and screen-shape previews were validated; review the PNGs manually."
+    }
 }

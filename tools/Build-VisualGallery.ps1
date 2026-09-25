@@ -25,16 +25,37 @@ if (!(Test-Path -LiteralPath $monkeyc)) {
     throw "Monkey C compiler not found under $SdkPath."
 }
 
-$manifestPath = Join-Path $projectRoot "visual-test-manifest.xml"
-$manifest = [xml](Get-Content -LiteralPath $manifestPath)
+$manifestTemplatePath = Join-Path $projectRoot "visual-test-manifest.xml"
+$manifest = [xml](Get-Content -LiteralPath (Join-Path $projectRoot "manifest.xml"))
 $namespace = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
 $namespace.AddNamespace("iq", "http://www.garmin.com/xml/connectiq")
 $supportedDevices = @($manifest.SelectNodes("//iq:product", $namespace) | ForEach-Object { $_.id })
+$galleryManifest = [xml](Get-Content -LiteralPath $manifestTemplatePath)
+$galleryNamespace = New-Object System.Xml.XmlNamespaceManager($galleryManifest.NameTable)
+$galleryNamespace.AddNamespace("iq", "http://www.garmin.com/xml/connectiq")
+$galleryProducts = $galleryManifest.SelectSingleNode("//iq:products", $galleryNamespace)
+$galleryProducts.RemoveAll()
+foreach ($deviceId in $supportedDevices) {
+    $product = $galleryManifest.CreateElement("iq", "product", "http://www.garmin.com/xml/connectiq")
+    $product.SetAttribute("id", $deviceId)
+    [void]$galleryProducts.AppendChild($product)
+}
+
+$generatedManifestPath = Join-Path $projectRoot "visual-test-manifest.generated.xml"
+$galleryManifest.Save($generatedManifestPath)
+$generatedJunglePath = Join-Path $projectRoot "visual-test.generated.jungle"
+[System.IO.File]::WriteAllLines($generatedJunglePath, @(
+    "project.manifest = visual-test-manifest.generated.xml",
+    "base.sourcePath = source;visual-tests/source"
+))
+
 $baselineManifestPath = Join-Path $projectRoot "visual-baselines\manifest.json"
 $baselineManifest = Get-Content -LiteralPath $baselineManifestPath -Raw | ConvertFrom-Json
 $visualDevices = @($baselineManifest.devices | ForEach-Object { $_.id })
-if (@(Compare-Object $supportedDevices $visualDevices).Count -gt 0) {
-    throw "Visual-test manifest products and visual baseline devices do not match."
+foreach ($visualDevice in $visualDevices) {
+    if ($supportedDevices -notcontains $visualDevice) {
+        throw "Visual baseline device '$visualDevice' is not in the production manifest."
+    }
 }
 
 $connectIqRoot = Split-Path -Parent (Split-Path -Parent $SdkPath)
@@ -59,11 +80,11 @@ if (!$Device) {
 
 foreach ($deviceId in $Device) {
     if ($supportedDevices -notcontains $deviceId) {
-        throw "Device '$deviceId' is not a visual-gallery representative."
+        throw "Device '$deviceId' is not in the production manifest."
     }
 
     $outputPath = Join-Path $projectRoot "bin\visual-gallery-$deviceId.prg"
-    $compilerOutput = @(& $monkeyc -f (Join-Path $projectRoot "visual-test.jungle") -d $deviceId -o $outputPath -y $DeveloperKey -w -l 1 2>&1)
+    $compilerOutput = @(& $monkeyc -f $generatedJunglePath -d $deviceId -o $outputPath -y $DeveloperKey -w -l 1 2>&1)
     $compilerOutput | ForEach-Object { Write-Host $_ }
 
     $warnings = @($compilerOutput | Where-Object { $_ -match "WARNING:" })
