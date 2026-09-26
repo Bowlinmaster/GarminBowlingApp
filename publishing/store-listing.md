@@ -20,7 +20,9 @@ from your Garmin watch.
 
 Bowling Stats is a focused ten-pin bowling score tracker for compatible Garmin
 watches. Record each roll as you bowl, follow the running score through all ten
-frames, and review your bowling history without reaching for your phone.
+frames, and review your bowling history without reaching for your phone. The
+app is designed for both touchscreen and button-controlled watches, with
+device-specific layouts for supported screen sizes.
 
 Features:
 
@@ -37,7 +39,9 @@ Features:
 - Made/attempt counts displayed alongside percentages
 - Completion date and time for saved games
 - Button controls, with touch support on compatible watches
-- Device-specific layouts for supported Garmin models
+- Device-specific layouts across 81 supported Garmin product families
+- Broad compatibility across Approach, D2, Descent, Enduro, epix, fenix,
+  Forerunner, Instinct, MARQ, Venu, and vivoactive watches
 
 Bowling Stats does not require an account or network connection. Game history
 and settings remain on the watch unless the app is removed or its saved data is
@@ -50,9 +54,16 @@ is planned for a future version.
 
 New in version 1.2.0:
 
-- Expanded detailed game history from 100 to 500 games
-- Faster and more memory-efficient saving and loading of large game histories
-- Automatic migration of existing saved games and lifetime statistics
+- Expanded detailed game history from 100 to 500 games stored locally on the
+  watch
+- Added paged storage for faster, more memory-efficient saving and loading as
+  game history grows
+- Preserved existing saved games and lifetime statistics through automatic
+  storage migration
+- Expanded compatibility from 37 to 81 Garmin product families, including
+  additional AMOLED and MIP watches
+- Added device-specific layouts and correctly sized launcher icons for newly
+  supported models
 
 ## Store Links
 
