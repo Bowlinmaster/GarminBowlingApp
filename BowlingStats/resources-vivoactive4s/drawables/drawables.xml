@@ -1,0 +1,3 @@
+<drawables>
+    <bitmap id="LauncherIcon" filename="../../resources/drawables/launcher_icon.svg" dithering="none" scaleX="30" scaleY="30" />
+</drawables>

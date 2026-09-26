@@ -105,6 +105,14 @@ class BowlingEntryLayoutProfiles {
             return descentG2();
         }
 
+        if (matchesPart(partNumber, ["006-B3258-00", "006-B3702-00"])) {
+            return descentMk2();
+        }
+
+        if (matchesPart(partNumber, ["006-B3542-00", "006-B3930-00"])) {
+            return descentMk2S();
+        }
+
         if (matchesPart(partNumber, ["006-B4222-00"])) {
             return descentMk343mm();
         }
@@ -127,6 +135,18 @@ class BowlingEntryLayoutProfiles {
 
         if (matchesPart(partNumber, ["006-B4314-00", "006-B4542-00", "006-B4556-00"])) {
             return epix2Pro51mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B3290-00", "006-B3515-00", "006-B3782-00", "006-B3767-00", "006-B3771-00"])) {
+            return fenix6Pro();
+        }
+
+        if (matchesPart(partNumber, ["006-B3288-00", "006-B3513-00", "006-B3765-00", "006-B3769-00"])) {
+            return fenix6SPro();
+        }
+
+        if (matchesPart(partNumber, ["006-B3291-00", "006-B3516-00", "006-B3783-00"])) {
+            return fenix6XPro();
         }
 
         if (matchesPart(partNumber, ["006-B4631-00"])) {
@@ -153,12 +173,36 @@ class BowlingEntryLayoutProfiles {
             return fenix9Pro47mm();
         }
 
+        if (matchesPart(partNumber, ["006-B4955-00"])) {
+            return fenix9ProSolar47mm();
+        }
+
+        if (matchesPart(partNumber, ["006-B4956-00"])) {
+            return fenix9ProSolar51mm();
+        }
+
         if (matchesPart(partNumber, ["006-B4815-00"])) {
             return fr170();
         }
 
         if (matchesPart(partNumber, ["006-B4814-00"])) {
             return fr170Music();
+        }
+
+        if (matchesPart(partNumber, ["006-B3077-00", "006-B3321-00", "006-B3913-00"])) {
+            return fr245Music();
+        }
+
+        if (matchesPart(partNumber, ["006-B3589-00", "006-B3794-00"])) {
+            return fr745();
+        }
+
+        if (matchesPart(partNumber, ["006-B3113-00", "006-B3441-00"])) {
+            return fr945();
+        }
+
+        if (matchesPart(partNumber, ["006-B3652-00"])) {
+            return fr945Lte();
         }
 
         if (matchesPart(partNumber, ["006-B4916-00", "006-B5214-00"])) {
@@ -191,6 +235,14 @@ class BowlingEntryLayoutProfiles {
 
         if (matchesPart(partNumber, ["006-B3740-00", "006-B3737-00"])) {
             return venuMercedesBenz();
+        }
+
+        if (matchesPart(partNumber, ["006-B3225-00", "006-B3388-00"])) {
+            return vivoactive4();
+        }
+
+        if (matchesPart(partNumber, ["006-B3224-00", "006-B3387-00"])) {
+            return vivoactive4S();
         }
 
         if (matchesPart(partNumber, ["006-B3907-00", "006-B3910-00", "006-B4135-00", "006-B4341-00"])) {
@@ -468,20 +520,31 @@ class BowlingEntryLayoutProfiles {
     static function d2Mach2() { return profile454("d2mach2"); }
     static function d2Mach2Pro() { return profile454("d2mach2pro"); }
     static function descentG2() { return profile390("descentg2"); }
+    static function descentMk2() { return profile280("descentmk2"); }
+    static function descentMk2S() { return profile240("descentmk2s"); }
     static function descentMk343mm() { return profile390("descentmk343mm"); }
     static function descentMk351mm() { return profile454("descentmk351mm"); }
     static function epix2() { return profile416("epix2"); }
     static function epix2Pro42mm() { return profile390("epix2pro42mm"); }
     static function epix2Pro47mm() { return profile416("epix2pro47mm"); }
     static function epix2Pro51mm() { return profile454("epix2pro51mm"); }
+    static function fenix6Pro() { return profile260("fenix6pro"); }
+    static function fenix6SPro() { return profile240("fenix6spro"); }
+    static function fenix6XPro() { return profile280("fenix6xpro"); }
     static function fenix8Pro47mm() { return profile454("fenix8pro47mm"); }
     static function fenixE() { return profile416("fenixe"); }
     static function fenix943mm() { return profile416("fenix943mm"); }
     static function fenix947mm() { return profile454("fenix947mm"); }
     static function fenix9Pro43mm() { return profile416("fenix9pro43mm"); }
     static function fenix9Pro47mm() { return profile454("fenix9pro47mm"); }
+    static function fenix9ProSolar47mm() { return profile260("fenix9prosolar47mm"); }
+    static function fenix9ProSolar51mm() { return profile280("fenix9prosolar51mm"); }
     static function fr170() { return profile390("fr170"); }
     static function fr170Music() { return profile390("fr170m"); }
+    static function fr245Music() { return profile240("fr245m"); }
+    static function fr745() { return profile240("fr745"); }
+    static function fr945() { return profile240("fr945"); }
+    static function fr945Lte() { return profile240("fr945lte"); }
     static function fr70() { return profile390("fr70"); }
     static function instinct3Amoled45mm() { return profile390("instinct3amoled45mm"); }
     static function instinct3Amoled50mm() { return profile416("instinct3amoled50mm"); }
@@ -490,6 +553,8 @@ class BowlingEntryLayoutProfiles {
     static function marq2Aviator() { return profile390("marq2aviator"); }
     static function venu() { return profile390("venu"); }
     static function venuMercedesBenz() { return profile390("venud"); }
+    static function vivoactive4() { return profile260("vivoactive4"); }
+    static function vivoactive4S() { return profile218("vivoactive4s"); }
 
     static function fr265() {
         return profile416("fr265");
